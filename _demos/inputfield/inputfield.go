@@ -1,11 +1,13 @@
 package main
 
 import (
-	"strings"
+	"regexp"
 
 	"github.com/jroimartin/gocui"
 	component "github.com/skanehira/gocui-component"
 )
+
+var rep = regexp.MustCompile(`^[\w]+$`)
 
 func main() {
 	gui, err := gocui.NewGui(gocui.Output256)
@@ -18,9 +20,11 @@ func main() {
 		panic(err)
 	}
 
-	component.NewInputField(gui, "Player Name", 0, 0, 13, 15).
+	component.NewInputField(gui, "password", 0, 0, 10, 15).
 		AddHandler(gocui.KeyEnter, quit).
-		AddValidator("invalid input", validator).
+		AddValidator("invalid password", validator).
+		SetMask().
+		SetMaskKeybinding(gocui.KeyCtrlA).
 		Draw()
 
 	if err := gui.MainLoop(); err != nil && err != gocui.ErrQuit {
@@ -33,8 +37,5 @@ func quit(g *gocui.Gui, v *gocui.View) error {
 }
 
 func validator(text string) bool {
-	if strings.Contains(text, "err") {
-		return false
-	}
-	return true
+	return rep.MatchString(text)
 }

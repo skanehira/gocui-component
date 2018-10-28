@@ -6,32 +6,33 @@ import (
 	"github.com/jroimartin/gocui"
 )
 
-type Validator func(text string) bool
+type Validate func(text string) bool
 
-type Validate struct {
+type Validator struct {
 	*gocui.Gui
-	Name      string
-	ErrMsg    string
-	IsValid   bool
-	Validator Validator
+	Name     string
+	ErrMsg   string
+	IsValid  bool
+	Validate Validate
 	*Position
 }
 
-func (v *Validate) DispValidateMsg() {
+// DispValidateMsg display validate error message
+func (v *Validator) DispValidateMsg() {
 	if vi, err := v.SetView(v.Name, v.X, v.Y, v.W, v.H); err != nil {
 		if err != gocui.ErrUnknownView {
 			panic(err)
 		}
 
-		vi.Highlight = true
 		vi.Frame = false
-		vi.SelBgColor = gocui.ColorBlack
-		vi.SelFgColor = gocui.ColorRed
+		vi.BgColor = gocui.ColorDefault
+		vi.FgColor = gocui.ColorRed
 
 		fmt.Fprint(vi, v.ErrMsg)
 	}
 }
 
-func (v *Validate) CloseValidateMsg() {
+// CloseValidateMsg close validate error message
+func (v *Validator) CloseValidateMsg() {
 	v.DeleteView(v.Name)
 }

@@ -2,6 +2,7 @@ package component
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/jroimartin/gocui"
 )
@@ -34,13 +35,16 @@ type Field struct {
 	*Attributes
 	Handlers Handlers
 	Margin   *Margin
-	*Validate
+	Mask     bool
+	*Validator
 }
 
 var labelPrefix = "label"
 
 // NewInputField new input label and field
 func NewInputField(gui *gocui.Gui, labelText string, x, y, labelWidth, fieldWidth int) *InputField {
+	gui.Cursor = true
+
 	// label psition
 	lp := &Position{
 		x,
@@ -64,7 +68,7 @@ func NewInputField(gui *gocui.Gui, labelText string, x, y, labelWidth, fieldWidt
 		Position: lp,
 		Attributes: &Attributes{
 			TextColor:   gocui.ColorYellow,
-			TextBgColor: gocui.ColorBlack,
+			TextBgColor: gocui.ColorDefault,
 		},
 		DrawFrame: false,
 		Margin: &Margin{
@@ -89,10 +93,10 @@ func NewInputField(gui *gocui.Gui, labelText string, x, y, labelWidth, fieldWidt
 			Top:  0,
 			Left: 0,
 		},
-		Validate: &Validate{
-			Gui:       gui,
-			Name:      label.Text + "errMsg",
-			Validator: func(text string) bool { return true },
+		Validator: &Validator{
+			Gui:      gui,
+			Name:     label.Text + "errMsg",
+			Validate: func(text string) bool { return true },
 			Position: &Position{
 				X: fp.W,
 				Y: fp.Y,
@@ -154,10 +158,10 @@ func (i *InputField) AddMarginLeft(left int) *InputField {
 }
 
 // AddValidator add input validator
-func (i *InputField) AddValidator(errMsg string, validator Validator) *InputField {
-	v := i.Field.Validate
+func (i *InputField) AddValidator(errMsg string, validate Validate) *InputField {
+	v := i.Field.Validator
 	v.ErrMsg = errMsg
-	v.Validator = validator
+	v.Validate = validate
 	v.W += len(errMsg)
 	return i
 }
@@ -171,6 +175,30 @@ func (i *InputField) SetLabelBorder() *InputField {
 // SetFieldBorder draw field border
 func (i *InputField) SetFieldBorder() *InputField {
 	i.Field.DrawFrame = true
+	return i
+}
+
+// Mask set input field to mask '*'
+func (i *InputField) SetMask() *InputField {
+	i.Field.Mask = true
+	return i
+}
+
+// SetMask set or unset input field to mask '*' with key
+func (i *InputField) SetMaskKeybinding(key Key) *InputField {
+	if err := i.Gui.SetKeybinding(i.Label.Text, key, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
+		v.Mask ^= '*'
+		return nil
+	}); err != nil {
+		panic(err)
+	}
+
+	return i
+}
+
+// SetCursor set input field cursor
+func (i *InputField) SetCursor(b bool) *InputField {
+	i.Gui.Cursor = b
 	return i
 }
 
@@ -190,11 +218,11 @@ func (i *InputField) Edit(v *gocui.View, key gocui.Key, ch rune, mod gocui.Modif
 	}
 
 	// get field text
-	text, _ := v.Line(0)
+	text := i.cutNewline(v.Buffer())
 	i.Field.Text = text
 
 	// validate input
-	i.Field.IsValid = i.Field.Validator(text)
+	i.Field.IsValid = i.Field.Validate(text)
 
 	if !i.Field.IsValid {
 		i.Field.DispValidateMsg()
@@ -210,7 +238,7 @@ func (i *InputField) GetFieldText() string {
 
 // IsValid valid field data will be return true
 func (i *InputField) IsValid() bool {
-	return i.Field.Validate.IsValid
+	return i.Field.Validator.IsValid
 }
 
 // Draw draw label and field
@@ -248,6 +276,13 @@ func (i *InputField) Draw() *InputField {
 
 		v.Editable = true
 		v.Editor = i
+
+		if i.Field.Mask {
+			v.Mask = '*'
+		}
+
+		// focus input field
+		i.Gui.SetCurrentView(i.Label.Text)
 	}
 
 	// set keybindings
@@ -259,26 +294,7 @@ func (i *InputField) Draw() *InputField {
 		}
 	}
 
-	// focus input field
-	i.Gui.SetCurrentView(i.Label.Text)
-	i.Gui.SetViewOnTop(i.Label.Text)
-
 	return i
-}
-
-func (i *InputField) addMargin(view interface{}) (int, int, int, int) {
-	switch v := view.(type) {
-	case *Field:
-		p := v.Position
-		m := v.Margin
-		return p.X + m.Left, p.Y + m.Top, p.W + m.Left, p.H + m.Top
-	case *Label:
-		p := v.Position
-		m := v.Margin
-		return p.X + m.Left, p.Y + m.Top, p.W + m.Left, p.H + m.Top
-	default:
-		panic("Unkown type")
-	}
 }
 
 // Close close input field
@@ -299,4 +315,23 @@ func (i *InputField) Close() {
 	if i.Field.Handlers != nil {
 		i.DeleteKeybindings(i.Label.Text)
 	}
+}
+
+func (i *InputField) addMargin(view interface{}) (int, int, int, int) {
+	switch v := view.(type) {
+	case *Field:
+		p := v.Position
+		m := v.Margin
+		return p.X + m.Left, p.Y + m.Top, p.W + m.Left, p.H + m.Top
+	case *Label:
+		p := v.Position
+		m := v.Margin
+		return p.X + m.Left, p.Y + m.Top, p.W + m.Left, p.H + m.Top
+	default:
+		panic("Unkown type")
+	}
+}
+
+func (i *InputField) cutNewline(text string) string {
+	return strings.Replace(text, "\n", "", -1)
 }

@@ -16,7 +16,7 @@ you can easily create the following components.
 
 # LoadMap
 - [x] InputField
-- [ ] Button
+- [x] Button
 - [ ] Form
 - [ ] Dialog
 - [ ] Table

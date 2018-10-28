@@ -240,11 +240,11 @@ func (i *InputField) Draw() *InputField {
 		v.Frame = i.Field.DrawFrame
 		v.Highlight = true
 
-		v.SelBgColor = i.Field.BgColor
-		v.SelFgColor = i.Field.FgColor
+		v.BgColor = i.Field.BgColor
+		v.FgColor = i.Field.FgColor
 
-		v.FgColor = i.Field.TextColor
-		v.BgColor = i.Field.TextBgColor
+		v.SelFgColor = i.Field.TextColor
+		v.SelBgColor = i.Field.TextBgColor
 
 		v.Editable = true
 		v.Editor = i

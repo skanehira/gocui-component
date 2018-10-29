@@ -27,12 +27,12 @@ func NewButton(gui *gocui.Gui, label string, x, y, width int) *Button {
 		Position: &Position{
 			x,
 			y,
-			x + width,
+			x + width + 2,
 			y + 2,
 		},
 		Attributes: &Attributes{
-			TextColor:   gocui.ColorBlack,
-			TextBgColor: gocui.ColorWhite,
+			FgColor: gocui.ColorWhite | gocui.AttrBold,
+			BgColor: gocui.ColorBlue,
 		},
 		Handlers: make(Handlers),
 	}
@@ -41,14 +41,15 @@ func NewButton(gui *gocui.Gui, label string, x, y, width int) *Button {
 }
 
 // AddHandler add handler
-func (b *Button) AddHandler(handlers Handlers) *Button {
-	b.Handlers = handlers
+func (b *Button) AddHandler(key Key, handler Handler) *Button {
+	b.Handlers[key] = handler
 	return b
 }
 
-// SetPrimary set button bgColor
-func (b *Button) SetPrimary() *Button {
-	b.Primary = true
+// AddAttribute add button fg and bg color
+func (b *Button) AddAttribute(fgColor, bgColor gocui.Attribute) *Button {
+	b.Attributes.FgColor = fgColor
+	b.Attributes.BgColor = bgColor
 	return b
 }
 
@@ -59,15 +60,14 @@ func (b *Button) Draw() {
 			panic(err)
 		}
 
-		if b.Primary {
-			v.FgColor = b.TextColor
-			v.BgColor = b.TextBgColor
-		}
+		v.Frame = false
+
+		v.FgColor = b.Attributes.FgColor
+		v.BgColor = b.Attributes.BgColor
 
 		b.Gui.SetCurrentView(b.Label)
-		b.Gui.SetViewOnTop(b.Label)
 
-		fmt.Fprint(v, b.Label)
+		fmt.Fprint(v, fmt.Sprintf(" %s ", b.Label))
 	}
 
 	if b.Handlers != nil {

@@ -98,10 +98,10 @@ func NewInputField(gui *gocui.Gui, labelText string, x, y, labelWidth, fieldWidt
 			Name:     label.Text + "errMsg",
 			Validate: func(text string) bool { return true },
 			Position: &Position{
-				X: fp.W,
-				Y: fp.Y,
-				W: fp.X + fp.W,
-				H: fp.H,
+				X: fp.X,
+				Y: fp.Y + 1,
+				W: fp.W,
+				H: fp.H + 1,
 			},
 		},
 	}
@@ -162,7 +162,9 @@ func (i *InputField) AddValidator(errMsg string, validate Validate) *InputField 
 	v := i.Field.Validator
 	v.ErrMsg = errMsg
 	v.Validate = validate
-	v.W += len(errMsg)
+	if v.X+len(errMsg) > v.W {
+		v.W += len(errMsg)
+	}
 	return i
 }
 
@@ -221,19 +223,31 @@ func (i *InputField) Edit(v *gocui.View, key gocui.Key, ch rune, mod gocui.Modif
 	text := i.cutNewline(v.Buffer())
 	i.Field.Text = text
 
-	// validate input
-	i.Field.IsValid = i.Field.Validate(text)
+	// validate
+	i.Validate()
+}
+
+// GetFieldText get input field text
+func (i *InputField) GetFieldText() string {
+	return i.Field.Text
+}
+
+// GetLabel get label text
+func (i *InputField) GetLabel() string {
+	return i.Label.Text
+}
+
+// Validate validate input field
+func (i *InputField) Validate() bool {
+	i.Field.IsValid = i.Field.Validate(i.Field.Text)
 
 	if !i.Field.IsValid {
 		i.Field.DispValidateMsg()
 	} else {
 		i.Field.CloseValidateMsg()
 	}
-}
 
-// GetFieldText get input field text
-func (i *InputField) GetFieldText() string {
-	return i.Field.Text
+	return i.Field.IsValid
 }
 
 // IsValid valid field data will be return true

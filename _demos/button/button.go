@@ -8,6 +8,7 @@ import (
 func main() {
 	gui, err := gocui.NewGui(gocui.Output256)
 	gui.Highlight = true
+	gui.SelFgColor = gocui.ColorBlue
 
 	if err != nil {
 		panic(err)
@@ -19,8 +20,8 @@ func main() {
 	}
 
 	component.NewButton(gui, "Save", 0, 0, 5).
-		AddHandler(component.Handlers{gocui.KeyEnter: quit, gocui.KeyTab: changeButton}).
-		SetPrimary().
+		AddHandler(gocui.KeyEnter, quit).
+		AddHandler(gocui.KeyTab, changeButton).
 		Draw()
 
 	if err := gui.MainLoop(); err != nil && err != gocui.ErrQuit {

@@ -37,6 +37,9 @@ func main() {
 		SetMask().
 		SetMaskKeybinding(gocui.KeyCtrlM)
 
+	signup.AddCheckBox("Age 18+")
+	signup.AddCheckBox("Age 20+")
+
 	signup.AddButton("Regist", signup.regist)
 	signup.AddButton("Cancel", quit)
 
@@ -60,7 +63,7 @@ func (s *signup) regist(g *gocui.Gui, v *gocui.View) error {
 		v.Title = v.Name()
 		v.Wrap = true
 
-		for label, text := range s.GetFormData() {
+		for label, text := range s.GetFieldText() {
 			fmt.Fprintf(v, "%s: %s\n", label, text)
 		}
 

@@ -1,6 +1,8 @@
 package component
 
 import (
+	"fmt"
+
 	"github.com/jroimartin/gocui"
 )
 
@@ -10,7 +12,9 @@ type Form struct {
 	views       []string
 	Name        string
 	Items       []*InputField
+	CheckBoxs   []*CheckBox
 	Buttons     []*Button
+	components  []Component
 	*Position
 }
 
@@ -35,8 +39,9 @@ func NewForm(gui *gocui.Gui, name string, x, y, w, h int) *Form {
 func (f *Form) AddInputField(label string, labelWidth, fieldWidth int) *InputField {
 	var y int
 
-	if len(f.Items) != 0 {
-		y = f.Items[len(f.Items)-1].Label.H
+	p := f.getLastViewPosition()
+	if p != nil {
+		y = p.H
 	} else {
 		y = f.Y
 	}
@@ -59,6 +64,7 @@ func (f *Form) AddInputField(label string, labelWidth, fieldWidth int) *InputFie
 
 	f.Items = append(f.Items, input)
 	f.views = append(f.views, label)
+	f.components = append(f.components, input)
 
 	return input
 }
@@ -68,15 +74,17 @@ func (f *Form) AddButton(label string, handler Handler) *Button {
 	var x int
 	var y int
 
-	if len(f.Buttons) != 0 {
-		x = f.Buttons[len(f.Buttons)-1].W
+	p := f.getLastViewPosition()
+	if p != nil {
+		if f.isButtonLastView() {
+			x = p.W
+			y = p.Y - 1
+		} else {
+			x = f.X
+			y = p.H
+		}
 	} else {
 		x = f.X
-	}
-
-	if len(f.Items) != 0 {
-		y = f.Items[len(f.Items)-1].Label.Position.H
-	} else {
 		y = f.Y
 	}
 
@@ -99,11 +107,45 @@ func (f *Form) AddButton(label string, handler Handler) *Button {
 
 	f.Buttons = append(f.Buttons, button)
 	f.views = append(f.views, label)
+	f.components = append(f.components, button)
+
 	return button
 }
 
+// AddCheckBox add checkbox
+func (f *Form) AddCheckBox(label string) *CheckBox {
+	var y int
+
+	p := f.getLastViewPosition()
+	if p != nil {
+		y = p.H
+	} else {
+		y = f.Y
+	}
+	fmt.Println(p)
+	checkbox := NewCheckBox(
+		f.Gui,
+		label,
+		f.X+1,
+		y,
+	)
+
+	if checkbox.H > f.H {
+		f.H = checkbox.H
+	}
+	if checkbox.W > f.W {
+		f.W = checkbox.W
+	}
+
+	f.CheckBoxs = append(f.CheckBoxs, checkbox)
+	f.views = append(f.views, label)
+	f.components = append(f.components, checkbox)
+
+	return checkbox
+}
+
 // GetFormData get form data
-func (f *Form) GetFormData() map[string]string {
+func (f *Form) GetFieldText() map[string]string {
 	data := make(map[string]string)
 
 	if len(f.Items) == 0 {
@@ -115,6 +157,21 @@ func (f *Form) GetFormData() map[string]string {
 	}
 
 	return data
+}
+
+// GetCheckBoxState get checkbox states
+func (f *Form) GetCheckBoxState() map[string]bool {
+	state := make(map[string]bool)
+
+	if len(f.CheckBoxs) == 0 {
+		return state
+	}
+
+	for _, box := range f.CheckBoxs {
+		state[box.GetLabel()] = box.IsChecked()
+	}
+
+	return state
 }
 
 // SetCurretnItem set current item index
@@ -163,6 +220,11 @@ func (f *Form) Draw() {
 		button.Draw()
 	}
 
+	for _, checkbox := range f.CheckBoxs {
+		checkbox.AddHandler(gocui.KeyTab, f.NextItem)
+		checkbox.Draw()
+	}
+
 	if len(f.views) != 0 {
 		f.Gui.SetCurrentView(f.views[0])
 		f.Gui.SetViewOnTop(f.views[0])
@@ -171,13 +233,39 @@ func (f *Form) Draw() {
 
 // Close close form
 func (f *Form) Close() {
-	f.Gui.DeleteView(f.Name)
-
-	for _, item := range f.Items {
-		item.Close()
+	if err := f.Gui.DeleteView(f.Name); err != nil {
+		if err != gocui.ErrUnknownView {
+			panic(err)
+		}
 	}
 
-	for _, button := range f.Buttons {
-		button.Close()
+	for _, c := range f.components {
+		c.Close()
 	}
+}
+
+func (f *Form) getLastViewPosition() *Position {
+	if len(f.views) == 0 {
+		return nil
+	}
+
+	name := f.views[len(f.views)-1]
+
+	for _, comp := range f.components {
+		if comp.GetLabel() == name {
+			return comp.GetPosition()
+		}
+	}
+
+	return nil
+}
+
+func (f *Form) isButtonLastView() bool {
+	if len(f.views) == 0 {
+		return false
+	}
+
+	c := f.components[len(f.components)-1]
+	_, ok := c.(*Button)
+	return ok
 }

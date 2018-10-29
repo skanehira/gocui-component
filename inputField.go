@@ -237,6 +237,11 @@ func (i *InputField) GetLabel() string {
 	return i.Label.Text
 }
 
+// GetPosition get input field position
+func (i *InputField) GetPosition() *Position {
+	return i.Field.Position
+}
+
 // Validate validate input field
 func (i *InputField) Validate() bool {
 	i.Field.IsValid = i.Field.Validate(i.Field.Text)
@@ -269,7 +274,7 @@ func (i *InputField) Draw() *InputField {
 		v.FgColor = i.Label.TextColor | gocui.AttrBold
 		v.BgColor = i.Label.TextBgColor
 
-		fmt.Fprint(v, i.Label.Text+": ")
+		fmt.Fprint(v, i.Label.Text)
 	}
 
 	// draw input

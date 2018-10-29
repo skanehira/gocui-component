@@ -53,6 +53,16 @@ func (b *Button) AddAttribute(fgColor, bgColor gocui.Attribute) *Button {
 	return b
 }
 
+// GetLabel get button label
+func (b *Button) GetLabel() string {
+	return b.Label
+}
+
+// GetPosition get button position
+func (b *Button) GetPosition() *Position {
+	return b.Position
+}
+
 // Draw draw button
 func (b *Button) Draw() {
 	if v, err := b.Gui.SetView(b.Label, b.X, b.Y, b.W, b.H); err != nil {

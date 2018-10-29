@@ -8,6 +8,8 @@ type Handlers map[Key]Handler
 
 type Component interface {
 	Close()
+	GetLabel() string
+	GetPosition() *Position
 }
 
 type Attributes struct {

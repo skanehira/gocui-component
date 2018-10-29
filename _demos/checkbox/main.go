@@ -7,8 +7,6 @@ import (
 
 func main() {
 	gui, err := gocui.NewGui(gocui.Output256)
-	gui.Highlight = true
-	gui.SelFgColor = gocui.ColorBlue
 
 	if err != nil {
 		panic(err)
@@ -19,9 +17,8 @@ func main() {
 		panic(err)
 	}
 
-	component.NewButton(gui, "Save", 0, 0, 5).
-		AddHandler(gocui.KeyEnter, quit).
-		AddHandler(gocui.KeyTab, changeButton).
+	component.NewCheckBox(gui, "Age +18:", 0, 0).
+		AddCheckKeybinding(gocui.KeySpace).
 		Draw()
 
 	if err := gui.MainLoop(); err != nil && err != gocui.ErrQuit {
@@ -31,15 +28,4 @@ func main() {
 
 func quit(g *gocui.Gui, v *gocui.View) error {
 	return gocui.ErrQuit
-}
-
-func changeButton(g *gocui.Gui, v *gocui.View) error {
-	switch v.Name() {
-	case "Save":
-		g.SetCurrentView("Cancel")
-	case "Cancel":
-		g.SetCurrentView("Save")
-	}
-
-	return nil
 }

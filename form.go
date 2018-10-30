@@ -1,8 +1,6 @@
 package component
 
 import (
-	"fmt"
-
 	"github.com/jroimartin/gocui"
 )
 
@@ -14,6 +12,7 @@ type Form struct {
 	Items       []*InputField
 	CheckBoxs   []*CheckBox
 	Buttons     []*Button
+	Selects     []*Select
 	components  []Component
 	*Position
 }
@@ -122,7 +121,7 @@ func (f *Form) AddCheckBox(label string) *CheckBox {
 	} else {
 		y = f.Y
 	}
-	fmt.Println(p)
+
 	checkbox := NewCheckBox(
 		f.Gui,
 		label,
@@ -142,6 +141,40 @@ func (f *Form) AddCheckBox(label string) *CheckBox {
 	f.components = append(f.components, checkbox)
 
 	return checkbox
+}
+
+// AddSelect add select
+func (f *Form) AddSelect(label string, labelWidth, listWidth int) *Select {
+	var y int
+
+	p := f.getLastViewPosition()
+	if p != nil {
+		y = p.H
+	} else {
+		y = f.Y
+	}
+
+	Select := NewSelect(
+		f.Gui,
+		label,
+		f.X+1,
+		y,
+		labelWidth,
+		listWidth,
+	)
+
+	if Select.Field.H > f.H {
+		f.H = Select.Field.H
+	}
+	if Select.Field.W > f.W {
+		f.W = Select.Field.W
+	}
+
+	f.Selects = append(f.Selects, Select)
+	f.views = append(f.views, label)
+	f.components = append(f.components, Select)
+
+	return Select
 }
 
 // GetFormData get form data
@@ -172,6 +205,21 @@ func (f *Form) GetCheckBoxState() map[string]bool {
 	}
 
 	return state
+}
+
+// GetSelectedOpt get selected options
+func (f *Form) GetSelectedOpt() map[string]string {
+	opts := make(map[string]string)
+
+	if len(f.Selects) == 0 {
+		return opts
+	}
+
+	for _, Select := range f.Selects {
+		opts[Select.GetLabel()] = Select.GetSelected()
+	}
+
+	return opts
 }
 
 // SetCurretnItem set current item index
@@ -223,6 +271,11 @@ func (f *Form) Draw() {
 	for _, checkbox := range f.CheckBoxs {
 		checkbox.AddHandler(gocui.KeyTab, f.NextItem)
 		checkbox.Draw()
+	}
+
+	for _, Select := range f.Selects {
+		Select.AddHandler(gocui.KeyTab, f.NextItem)
+		Select.Draw()
 	}
 
 	if len(f.views) != 0 {

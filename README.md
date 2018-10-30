@@ -21,5 +21,5 @@ you can easily create the following components.
 - [ ] Dialog
 - [ ] Table
 - [ ] Radio
-- [X] CheckBox
-- [ ] Select
+- [x] CheckBox
+- [x] Select

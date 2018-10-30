@@ -36,6 +36,7 @@ type Field struct {
 	Handlers Handlers
 	Margin   *Margin
 	Mask     bool
+	Editable bool
 	*Validator
 }
 
@@ -104,6 +105,7 @@ func NewInputField(gui *gocui.Gui, labelText string, x, y, labelWidth, fieldWidt
 				H: fp.H + 1,
 			},
 		},
+		Editable: true,
 	}
 
 	// new input field
@@ -204,6 +206,16 @@ func (i *InputField) SetCursor(b bool) *InputField {
 	return i
 }
 
+// SetEditable if editmode is true can input
+func (i *InputField) SetEditable(b bool) *InputField {
+	i.Field.Editable = b
+	return i
+}
+
+func (i *InputField) SetFocus() {
+	i.Gui.SetCurrentView(i.Label.Text)
+}
+
 // Edit input field editor
 func (i *InputField) Edit(v *gocui.View, key gocui.Key, ch rune, mod gocui.Modifier) {
 	switch {
@@ -220,8 +232,7 @@ func (i *InputField) Edit(v *gocui.View, key gocui.Key, ch rune, mod gocui.Modif
 	}
 
 	// get field text
-	text := i.cutNewline(v.Buffer())
-	i.Field.Text = text
+	i.Field.Text = i.cutNewline(v.Buffer())
 
 	// validate
 	i.Validate()
@@ -293,7 +304,7 @@ func (i *InputField) Draw() *InputField {
 		v.SelFgColor = i.Field.TextColor
 		v.SelBgColor = i.Field.TextBgColor
 
-		v.Editable = true
+		v.Editable = i.Field.Editable
 		v.Editor = i
 
 		if i.Field.Mask {

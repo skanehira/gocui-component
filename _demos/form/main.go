@@ -38,7 +38,8 @@ func main() {
 		SetMaskKeybinding(gocui.KeyCtrlM)
 
 	signup.AddCheckBox("Age 18+")
-	signup.AddCheckBox("Age 20+")
+
+	signup.AddSelect("Language", 10, 10).AddOptions("Japanese", "English", "Chinese")
 
 	signup.AddButton("Regist", signup.regist)
 	signup.AddButton("Cancel", quit)
@@ -55,7 +56,7 @@ func (s *signup) regist(g *gocui.Gui, v *gocui.View) error {
 		return nil
 	}
 
-	if v, err := g.SetView("registed", 0, 0, 30, 5); err != nil {
+	if v, err := g.SetView("registed", 0, 0, 30, 10); err != nil {
 		if err != gocui.ErrUnknownView {
 			panic(err)
 		}
@@ -65,6 +66,14 @@ func (s *signup) regist(g *gocui.Gui, v *gocui.View) error {
 
 		for label, text := range s.GetFieldText() {
 			fmt.Fprintf(v, "%s: %s\n", label, text)
+		}
+
+		for label, state := range s.GetCheckBoxState() {
+			fmt.Fprintf(v, "%s: %t\n", label, state)
+		}
+
+		for label, opt := range s.GetSelectedOpt() {
+			fmt.Fprintf(v, "%s: %s\n", label, opt)
 		}
 
 		g.SetCurrentView(v.Name())

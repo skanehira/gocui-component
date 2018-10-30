@@ -7,7 +7,6 @@ import (
 type Form struct {
 	*gocui.Gui
 	currentView int
-	views       []string
 	Name        string
 	Items       []*InputField
 	CheckBoxs   []*CheckBox
@@ -62,7 +61,6 @@ func (f *Form) AddInputField(label string, labelWidth, fieldWidth int) *InputFie
 	}
 
 	f.Items = append(f.Items, input)
-	f.views = append(f.views, label)
 	f.components = append(f.components, input)
 
 	return input
@@ -105,7 +103,6 @@ func (f *Form) AddButton(label string, handler Handler) *Button {
 	}
 
 	f.Buttons = append(f.Buttons, button)
-	f.views = append(f.views, label)
 	f.components = append(f.components, button)
 
 	return button
@@ -137,7 +134,6 @@ func (f *Form) AddCheckBox(label string) *CheckBox {
 	}
 
 	f.CheckBoxs = append(f.CheckBoxs, checkbox)
-	f.views = append(f.views, label)
 	f.components = append(f.components, checkbox)
 
 	return checkbox
@@ -171,7 +167,6 @@ func (f *Form) AddSelect(label string, labelWidth, listWidth int) *Select {
 	}
 
 	f.Selects = append(f.Selects, Select)
-	f.views = append(f.views, label)
 	f.components = append(f.components, Select)
 
 	return Select
@@ -225,7 +220,7 @@ func (f *Form) GetSelectedOpt() map[string]string {
 // SetCurretnItem set current item index
 func (f *Form) SetCurrentItem(index int) *Form {
 	f.currentView = index
-	f.SetCurrentView(f.views[index])
+	f.components[index].SetFocus()
 	return f
 }
 
@@ -243,8 +238,8 @@ func (f *Form) Validate() bool {
 
 // NextItem to next item
 func (f *Form) NextItem(g *gocui.Gui, v *gocui.View) error {
-	f.currentView = (f.currentView + 1) % len(f.views)
-	g.SetCurrentView(f.views[f.currentView])
+	f.currentView = (f.currentView + 1) % len(f.components)
+	f.components[f.currentView].SetFocus()
 	return nil
 }
 
@@ -258,29 +253,13 @@ func (f *Form) Draw() {
 		v.Title = f.Name
 	}
 
-	for _, item := range f.Items {
-		item.AddHandler(gocui.KeyTab, f.NextItem)
-		item.Draw()
+	for _, cp := range f.components {
+		cp.addHandlerOnly(gocui.KeyTab, f.NextItem)
+		cp.Draw()
 	}
 
-	for _, button := range f.Buttons {
-		button.AddHandler(gocui.KeyTab, f.NextItem)
-		button.Draw()
-	}
-
-	for _, checkbox := range f.CheckBoxs {
-		checkbox.AddHandler(gocui.KeyTab, f.NextItem)
-		checkbox.Draw()
-	}
-
-	for _, Select := range f.Selects {
-		Select.AddHandler(gocui.KeyTab, f.NextItem)
-		Select.Draw()
-	}
-
-	if len(f.views) != 0 {
-		f.Gui.SetCurrentView(f.views[0])
-		f.Gui.SetViewOnTop(f.views[0])
+	if len(f.components) != 0 {
+		f.components[0].SetFocus()
 	}
 }
 
@@ -298,27 +277,24 @@ func (f *Form) Close() {
 }
 
 func (f *Form) getLastViewPosition() *Position {
-	if len(f.views) == 0 {
+	cpl := len(f.components)
+	if cpl == 0 {
 		return nil
 	}
 
-	name := f.views[len(f.views)-1]
-
-	for _, comp := range f.components {
-		if comp.GetLabel() == name {
-			return comp.GetPosition()
-		}
-	}
-
-	return nil
+	return f.components[cpl-1].GetPosition()
 }
 
 func (f *Form) isButtonLastView() bool {
-	if len(f.views) == 0 {
+	cpl := len(f.components)
+	if cpl == 0 {
 		return false
 	}
 
-	c := f.components[len(f.components)-1]
-	_, ok := c.(*Button)
+	_, ok := f.components[cpl-1].(*Button)
 	return ok
+}
+
+func (f *Form) addHandlerOnly(key Key, handler Handler) {
+	// do nothing
 }

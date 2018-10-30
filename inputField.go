@@ -212,7 +212,9 @@ func (i *InputField) SetEditable(b bool) *InputField {
 	return i
 }
 
+// SetFocus set focus to input field
 func (i *InputField) SetFocus() {
+	i.Gui.Cursor = true
 	i.Gui.SetCurrentView(i.Label.Text)
 }
 
@@ -272,7 +274,7 @@ func (i *InputField) IsValid() bool {
 }
 
 // Draw draw label and field
-func (i *InputField) Draw() *InputField {
+func (i *InputField) Draw() {
 	// draw label
 	x, y, w, h := i.addMargin(i.Label)
 	if v, err := i.Gui.SetView(labelPrefix+i.Label.Text, x, y, w, h); err != nil {
@@ -323,8 +325,6 @@ func (i *InputField) Draw() *InputField {
 			}
 		}
 	}
-
-	return i
 }
 
 // Close close input field
@@ -364,4 +364,8 @@ func (i *InputField) addMargin(view interface{}) (int, int, int, int) {
 
 func (i *InputField) cutNewline(text string) string {
 	return strings.Replace(text, "\n", "", -1)
+}
+
+func (i *InputField) addHandlerOnly(key Key, handler Handler) {
+	i.AddHandler(key, handler)
 }

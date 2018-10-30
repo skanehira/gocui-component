@@ -64,10 +64,15 @@ func (s *Select) GetSelected() string {
 	return s.options[s.currentOpt]
 }
 
+// SetFocus set focus to select
+func (s *Select) SetFocus() {
+	s.Gui.Cursor = true
+	s.Gui.SetCurrentView(s.GetLabel())
+}
+
 // Draw draw select
-func (s *Select) Draw() *Select {
+func (s *Select) Draw() {
 	s.InputField.Draw()
-	return s
 }
 
 func (s *Select) nextOpt(g *gocui.Gui, v *gocui.View) error {

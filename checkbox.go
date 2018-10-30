@@ -105,8 +105,14 @@ func (c *CheckBox) IsChecked() bool {
 	return c.isChecked
 }
 
+// SetFocus set focus to checkbox
+func (c *CheckBox) SetFocus() {
+	c.Gui.Cursor = true
+	c.Gui.SetCurrentView(c.GetLabel())
+}
+
 // Draw draw label and checkbox
-func (c *CheckBox) Draw() *CheckBox {
+func (c *CheckBox) Draw() {
 	// draw label
 	if v, err := c.Gui.SetView(c.label, c.X, c.Y, c.W, c.H); err != nil {
 		if err != gocui.ErrUnknownView {
@@ -138,8 +144,6 @@ func (c *CheckBox) Draw() *CheckBox {
 			}
 		}
 	}
-
-	return c
 }
 
 // Close close checkbox
@@ -158,4 +162,8 @@ func (c *CheckBox) Close() {
 	}
 
 	c.DeleteKeybindings(c.box.name)
+}
+
+func (c *CheckBox) addHandlerOnly(key Key, handler Handler) {
+	c.AddHandler(key, handler)
 }

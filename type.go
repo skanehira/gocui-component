@@ -10,6 +10,9 @@ type Component interface {
 	Close()
 	GetLabel() string
 	GetPosition() *Position
+	SetFocus()
+	Draw()
+	addHandlerOnly(Key, Handler)
 }
 
 type Attributes struct {

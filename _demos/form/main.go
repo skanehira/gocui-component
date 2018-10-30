@@ -23,10 +23,12 @@ func main() {
 		panic(err)
 	}
 
+	// new form
 	signup := &signup{
 		component.NewForm(gui, "Sign Up", 0, 0, 0, 0),
 	}
 
+	// add input field
 	signup.AddInputField("First Name", 11, 18).
 		AddValidator("required input", requireValidator)
 	signup.AddInputField("Last Name", 11, 18).
@@ -37,10 +39,13 @@ func main() {
 		SetMask().
 		SetMaskKeybinding(gocui.KeyCtrlM)
 
+	// add checkbox
 	signup.AddCheckBox("Age 18+")
 
+	// add select
 	signup.AddSelect("Language", 10, 10).AddOptions("Japanese", "English", "Chinese")
 
+	// add button
 	signup.AddButton("Regist", signup.regist)
 	signup.AddButton("Cancel", quit)
 

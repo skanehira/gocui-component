@@ -63,6 +63,12 @@ func (b *Button) GetPosition() *Position {
 	return b.Position
 }
 
+// SetFocus set focus to button
+func (b *Button) SetFocus() {
+	b.Gui.Cursor = true
+	b.Gui.SetCurrentView(b.GetLabel())
+}
+
 // Draw draw button
 func (b *Button) Draw() {
 	if v, err := b.Gui.SetView(b.Label, b.X, b.Y, b.W, b.H); err != nil {
@@ -101,4 +107,8 @@ func (b *Button) Close() {
 	if b.Handlers != nil {
 		b.DeleteKeybindings(b.Label)
 	}
+}
+
+func (b *Button) addHandlerOnly(key Key, handler Handler) {
+	b.Handlers[key] = handler
 }

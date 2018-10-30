@@ -10,16 +10,16 @@ type Validate func(text string) bool
 
 type Validator struct {
 	*gocui.Gui
-	Name     string
-	ErrMsg   string
-	IsValid  bool
-	Validate Validate
+	name     string
+	errMsg   string
+	isValid  bool
+	validate Validate
 	*Position
 }
 
 // DispValidateMsg display validate error message
 func (v *Validator) DispValidateMsg() {
-	if vi, err := v.SetView(v.Name, v.X, v.Y, v.W, v.H); err != nil {
+	if vi, err := v.SetView(v.name, v.x, v.y, v.w, v.h); err != nil {
 		if err != gocui.ErrUnknownView {
 			panic(err)
 		}
@@ -28,11 +28,16 @@ func (v *Validator) DispValidateMsg() {
 		vi.BgColor = gocui.ColorDefault
 		vi.FgColor = gocui.ColorRed
 
-		fmt.Fprint(vi, v.ErrMsg)
+		fmt.Fprint(vi, v.errMsg)
 	}
 }
 
 // CloseValidateMsg close validate error message
 func (v *Validator) CloseValidateMsg() {
-	v.DeleteView(v.Name)
+	v.DeleteView(v.name)
+}
+
+// IsValid if valid return true
+func (v *Validator) IsValid() bool {
+	return v.isValid
 }

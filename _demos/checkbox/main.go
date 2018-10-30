@@ -18,7 +18,6 @@ func main() {
 	}
 
 	component.NewCheckBox(gui, "Age +18:", 0, 0).
-		AddCheckKeybinding(gocui.KeySpace).
 		Draw()
 
 	if err := gui.MainLoop(); err != nil && err != gocui.ErrQuit {

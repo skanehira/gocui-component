@@ -8,11 +8,11 @@ import (
 
 type Button struct {
 	*gocui.Gui
-	Label   string
-	Primary bool
+	label   string
+	primary bool
 	*Position
 	*Attributes
-	Handlers Handlers
+	handlers Handlers
 }
 
 // NewButton new button
@@ -23,7 +23,7 @@ func NewButton(gui *gocui.Gui, label string, x, y, width int) *Button {
 
 	b := &Button{
 		Gui:   gui,
-		Label: label,
+		label: label,
 		Position: &Position{
 			x,
 			y,
@@ -31,10 +31,10 @@ func NewButton(gui *gocui.Gui, label string, x, y, width int) *Button {
 			y + 2,
 		},
 		Attributes: &Attributes{
-			FgColor: gocui.ColorWhite | gocui.AttrBold,
-			BgColor: gocui.ColorBlue,
+			fgColor: gocui.ColorWhite | gocui.AttrBold,
+			bgColor: gocui.ColorBlue,
 		},
-		Handlers: make(Handlers),
+		handlers: make(Handlers),
 	}
 
 	return b
@@ -42,20 +42,20 @@ func NewButton(gui *gocui.Gui, label string, x, y, width int) *Button {
 
 // AddHandler add handler
 func (b *Button) AddHandler(key Key, handler Handler) *Button {
-	b.Handlers[key] = handler
+	b.handlers[key] = handler
 	return b
 }
 
 // AddAttribute add button fg and bg color
 func (b *Button) AddAttribute(fgColor, bgColor gocui.Attribute) *Button {
-	b.Attributes.FgColor = fgColor
-	b.Attributes.BgColor = bgColor
+	b.fgColor = fgColor
+	b.bgColor = bgColor
 	return b
 }
 
 // GetLabel get button label
 func (b *Button) GetLabel() string {
-	return b.Label
+	return b.label
 }
 
 // GetPosition get button position
@@ -71,24 +71,24 @@ func (b *Button) SetFocus() {
 
 // Draw draw button
 func (b *Button) Draw() {
-	if v, err := b.Gui.SetView(b.Label, b.X, b.Y, b.W, b.H); err != nil {
+	if v, err := b.Gui.SetView(b.label, b.x, b.y, b.w, b.h); err != nil {
 		if err != gocui.ErrUnknownView {
 			panic(err)
 		}
 
 		v.Frame = false
 
-		v.FgColor = b.Attributes.FgColor
-		v.BgColor = b.Attributes.BgColor
+		v.FgColor = b.fgColor
+		v.BgColor = b.bgColor
 
-		b.Gui.SetCurrentView(b.Label)
+		b.Gui.SetCurrentView(b.label)
 
-		fmt.Fprint(v, fmt.Sprintf(" %s ", b.Label))
+		fmt.Fprint(v, fmt.Sprintf(" %s ", b.label))
 	}
 
-	if b.Handlers != nil {
-		for key, handler := range b.Handlers {
-			if err := b.Gui.SetKeybinding(b.Label, key, gocui.ModNone, handler); err != nil {
+	if b.handlers != nil {
+		for key, handler := range b.handlers {
+			if err := b.Gui.SetKeybinding(b.label, key, gocui.ModNone, handler); err != nil {
 				panic(err)
 			}
 		}
@@ -98,17 +98,17 @@ func (b *Button) Draw() {
 
 // Close close button
 func (b *Button) Close() {
-	if err := b.DeleteView(b.Label); err != nil {
+	if err := b.DeleteView(b.label); err != nil {
 		if err != gocui.ErrUnknownView {
 			panic(err)
 		}
 	}
 
-	if b.Handlers != nil {
-		b.DeleteKeybindings(b.Label)
+	if b.handlers != nil {
+		b.DeleteKeybindings(b.label)
 	}
 }
 
 func (b *Button) addHandlerOnly(key Key, handler Handler) {
-	b.Handlers[key] = handler
+	b.handlers[key] = handler
 }

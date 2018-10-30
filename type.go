@@ -16,13 +16,13 @@ type Component interface {
 }
 
 type Attributes struct {
-	TextColor   gocui.Attribute
-	TextBgColor gocui.Attribute
-	FgColor     gocui.Attribute
-	BgColor     gocui.Attribute
+	textColor   gocui.Attribute
+	textBgColor gocui.Attribute
+	fgColor     gocui.Attribute
+	bgColor     gocui.Attribute
 }
 
 type Position struct {
-	X, Y int
-	W, H int
+	x, y int
+	w, h int
 }

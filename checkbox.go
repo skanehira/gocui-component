@@ -13,7 +13,7 @@ type CheckBox struct {
 	box       *box
 	*Position
 	*Attributes
-	Handlers Handlers
+	handlers Handlers
 }
 
 type box struct {
@@ -25,10 +25,10 @@ type box struct {
 // NewCheckBox new checkbox
 func NewCheckBox(gui *gocui.Gui, label string, x, y int) *CheckBox {
 	p := &Position{
-		X: x,
-		Y: y,
-		W: x + len(label) + 1,
-		H: y + 2,
+		x: x,
+		y: y,
+		w: x + len(label) + 1,
+		h: y + 2,
 	}
 
 	c := &CheckBox{
@@ -37,27 +37,27 @@ func NewCheckBox(gui *gocui.Gui, label string, x, y int) *CheckBox {
 		isChecked: false,
 		Position:  p,
 		Attributes: &Attributes{
-			TextColor:   gocui.ColorYellow | gocui.AttrBold,
-			TextBgColor: gocui.ColorDefault,
+			textColor:   gocui.ColorYellow | gocui.AttrBold,
+			textBgColor: gocui.ColorDefault,
 		},
 		box: &box{
 			name: label,
 			Position: &Position{
-				X: p.W,
-				Y: p.Y,
-				W: p.W + 2,
-				H: p.H,
+				x: p.w,
+				y: p.y,
+				w: p.w + 2,
+				h: p.h,
 			},
 			Attributes: &Attributes{
-				TextColor:   gocui.ColorBlack,
-				TextBgColor: gocui.ColorCyan,
+				textColor:   gocui.ColorBlack,
+				textBgColor: gocui.ColorCyan,
 			},
 		},
-		Handlers: make(Handlers),
+		handlers: make(Handlers),
 	}
 
-	c.Handlers[gocui.KeyEnter] = c.Check
-	c.Handlers[gocui.KeySpace] = c.Check
+	c.handlers[gocui.KeyEnter] = c.Check
+	c.handlers[gocui.KeySpace] = c.Check
 	return c
 }
 
@@ -84,17 +84,17 @@ func (c *CheckBox) Check(g *gocui.Gui, v *gocui.View) error {
 	return nil
 }
 
-// AddCheckKeybinding set check keybinding
+// AddHandler add handler
 func (c *CheckBox) AddHandler(key Key, handler Handler) *CheckBox {
-	c.Handlers[key] = handler
+	c.handlers[key] = handler
 	return c
 }
 
 // AddAttribute add text and bg color
 func (c *CheckBox) AddAttribute(textColor, textBgColor gocui.Attribute) *CheckBox {
 	c.Attributes = &Attributes{
-		TextColor:   textColor,
-		TextBgColor: textBgColor,
+		textColor:   textColor,
+		textBgColor: textBgColor,
 	}
 
 	return c
@@ -114,31 +114,31 @@ func (c *CheckBox) SetFocus() {
 // Draw draw label and checkbox
 func (c *CheckBox) Draw() {
 	// draw label
-	if v, err := c.Gui.SetView(c.label, c.X, c.Y, c.W, c.H); err != nil {
+	if v, err := c.Gui.SetView(c.label, c.x, c.y, c.w, c.h); err != nil {
 		if err != gocui.ErrUnknownView {
 			panic(err)
 		}
 
 		v.Frame = false
-		v.FgColor = c.Attributes.TextColor
-		v.BgColor = c.Attributes.TextBgColor
+		v.FgColor = c.textColor
+		v.BgColor = c.textBgColor
 		fmt.Fprint(v, c.label)
 	}
 
 	// draw checkbox
 	b := c.box
-	if v, err := c.Gui.SetView(b.name, b.X, b.Y, b.W, b.H); err != nil {
+	if v, err := c.Gui.SetView(b.name, b.x, b.y, b.w, b.h); err != nil {
 		if err != gocui.ErrUnknownView {
 			panic(err)
 		}
 
 		v.Frame = false
-		v.FgColor = b.Attributes.TextColor
-		v.BgColor = b.Attributes.TextBgColor
+		v.FgColor = b.textColor
+		v.BgColor = b.textBgColor
 
 		c.Gui.SetCurrentView(v.Name())
 
-		for key, handler := range c.Handlers {
+		for key, handler := range c.handlers {
 			if err := c.Gui.SetKeybinding(v.Name(), key, gocui.ModNone, handler); err != nil {
 				panic(err)
 			}

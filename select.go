@@ -44,10 +44,10 @@ func (s *Select) AddOptions(opts ...string) *Select {
 // AddAttribute add select attribute
 func (s *Select) AddAttribute(textColor, textBgColor, fgColor, bgColor gocui.Attribute) *Select {
 	s.listColor = &Attributes{
-		TextColor:   textColor,
-		TextBgColor: textBgColor,
-		FgColor:     fgColor,
-		BgColor:     bgColor,
+		textColor:   textColor,
+		textBgColor: textBgColor,
+		fgColor:     fgColor,
+		bgColor:     bgColor,
 	}
 
 	return s
@@ -133,10 +133,10 @@ func (s *Select) expandOpt(g *gocui.Gui, vi *gocui.View) error {
 		s.isExpanded = true
 		g.Cursor = false
 
-		x := s.Field.X
-		w := s.Field.W
+		x := s.field.x
+		w := s.field.w
 
-		y := s.Field.Y
+		y := s.field.y
 		h := y + 2
 
 		for i, opt := range s.options {
@@ -149,10 +149,10 @@ func (s *Select) expandOpt(g *gocui.Gui, vi *gocui.View) error {
 
 				v.Frame = false
 
-				v.SelFgColor = s.listColor.TextColor
-				v.SelBgColor = s.listColor.TextBgColor
-				v.FgColor = s.listColor.FgColor
-				v.BgColor = s.listColor.BgColor
+				v.SelFgColor = s.listColor.textColor
+				v.SelBgColor = s.listColor.textBgColor
+				v.FgColor = s.listColor.fgColor
+				v.BgColor = s.listColor.bgColor
 
 				for key, handler := range s.listHandlers {
 					if err := g.SetKeybinding(v.Name(), key, gocui.ModNone, handler); err != nil {

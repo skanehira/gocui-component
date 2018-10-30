@@ -8,35 +8,35 @@ import (
 )
 
 type Margin struct {
-	Top  int
-	Left int
+	top  int
+	left int
 }
 
 type InputField struct {
 	*gocui.Gui
-	Label *Label
-	Field *Field
+	label *Label
+	field *Field
 }
 
 type Label struct {
-	Text      string
-	Width     int
-	DrawFrame bool
+	text      string
+	width     int
+	drawFrame bool
 	*Position
 	*Attributes
-	Margin *Margin
+	margin *Margin
 }
 
 type Field struct {
-	Text      string
-	Width     int
-	DrawFrame bool
+	text      string
+	width     int
+	drawFrame bool
 	*Position
 	*Attributes
-	Handlers Handlers
-	Margin   *Margin
-	Mask     bool
-	Editable bool
+	handlers Handlers
+	margin   *Margin
+	mask     bool
+	editable bool
 	*Validator
 }
 
@@ -56,63 +56,63 @@ func NewInputField(gui *gocui.Gui, labelText string, x, y, labelWidth, fieldWidt
 
 	// field position
 	fp := &Position{
-		lp.W,
-		lp.Y,
-		lp.W + fieldWidth,
-		lp.H,
+		lp.w,
+		lp.y,
+		lp.w + fieldWidth,
+		lp.h,
 	}
 
 	// new label
 	label := &Label{
-		Text:     labelText,
-		Width:    labelWidth,
+		text:     labelText,
+		width:    labelWidth,
 		Position: lp,
 		Attributes: &Attributes{
-			TextColor:   gocui.ColorYellow,
-			TextBgColor: gocui.ColorDefault,
+			textColor:   gocui.ColorYellow,
+			textBgColor: gocui.ColorDefault,
 		},
-		DrawFrame: false,
-		Margin: &Margin{
-			Top:  0,
-			Left: 0,
+		drawFrame: false,
+		margin: &Margin{
+			top:  0,
+			left: 0,
 		},
 	}
 
 	// new field
 	field := &Field{
-		Width:    fieldWidth,
+		width:    fieldWidth,
 		Position: fp,
 		Attributes: &Attributes{
-			TextColor:   gocui.ColorBlack,
-			TextBgColor: gocui.ColorCyan,
-			FgColor:     gocui.ColorBlack,
-			BgColor:     gocui.ColorCyan,
+			textColor:   gocui.ColorBlack,
+			textBgColor: gocui.ColorCyan,
+			fgColor:     gocui.ColorBlack,
+			bgColor:     gocui.ColorCyan,
 		},
-		Handlers:  make(Handlers),
-		DrawFrame: false,
-		Margin: &Margin{
-			Top:  0,
-			Left: 0,
+		handlers:  make(Handlers),
+		drawFrame: false,
+		margin: &Margin{
+			top:  0,
+			left: 0,
 		},
 		Validator: &Validator{
 			Gui:      gui,
-			Name:     label.Text + "errMsg",
-			Validate: func(text string) bool { return true },
+			name:     label.text + "errMsg",
+			validate: func(text string) bool { return true },
 			Position: &Position{
-				X: fp.X,
-				Y: fp.Y + 1,
-				W: fp.W,
-				H: fp.H + 1,
+				x: fp.x,
+				y: fp.y + 1,
+				w: fp.w,
+				h: fp.h + 1,
 			},
 		},
-		Editable: true,
+		editable: true,
 	}
 
 	// new input field
 	i := &InputField{
 		Gui:   gui,
-		Label: label,
-		Field: field,
+		label: label,
+		field: field,
 	}
 
 	return i
@@ -120,20 +120,20 @@ func NewInputField(gui *gocui.Gui, labelText string, x, y, labelWidth, fieldWidt
 
 // AddFieldTextAttribute add field colors
 func (i *InputField) AddFieldAttribute(textColor, textBgColor, fgColor, bgColor gocui.Attribute) *InputField {
-	i.Field.Attributes = &Attributes{
-		TextColor:   textColor,
-		TextBgColor: textBgColor,
-		FgColor:     fgColor,
-		BgColor:     bgColor,
+	i.field.Attributes = &Attributes{
+		textColor:   textColor,
+		textBgColor: textBgColor,
+		fgColor:     fgColor,
+		bgColor:     bgColor,
 	}
 	return i
 }
 
 // AddLabelAttribute add label colors
 func (i *InputField) AddLabelAttribute(textColor, textBgColor gocui.Attribute) *InputField {
-	i.Label.Attributes = &Attributes{
-		TextColor:   textColor,
-		TextBgColor: textBgColor,
+	i.label.Attributes = &Attributes{
+		textColor:   textColor,
+		textBgColor: textBgColor,
 	}
 
 	return i
@@ -141,56 +141,56 @@ func (i *InputField) AddLabelAttribute(textColor, textBgColor gocui.Attribute) *
 
 // AddHandler add keybinding
 func (i *InputField) AddHandler(key Key, handler Handler) *InputField {
-	i.Field.Handlers[key] = handler
+	i.field.handlers[key] = handler
 	return i
 }
 
 // AddMarginTop add margin top
 func (i *InputField) AddMarginTop(top int) *InputField {
-	i.Label.Margin.Top += top
-	i.Field.Margin.Top += top
+	i.label.margin.top += top
+	i.field.margin.top += top
 	return i
 }
 
 // AddMarginLeft add margin left
 func (i *InputField) AddMarginLeft(left int) *InputField {
-	i.Label.Margin.Left += left
-	i.Field.Margin.Left += left
+	i.label.margin.left += left
+	i.field.margin.left += left
 	return i
 }
 
 // AddValidator add input validator
 func (i *InputField) AddValidator(errMsg string, validate Validate) *InputField {
-	v := i.Field.Validator
-	v.ErrMsg = errMsg
-	v.Validate = validate
-	if v.X+len(errMsg) > v.W {
-		v.W += len(errMsg)
+	v := i.field.Validator
+	v.errMsg = errMsg
+	v.validate = validate
+	if v.x+len(errMsg) > v.w {
+		v.w += len(errMsg)
 	}
 	return i
 }
 
 // SetLabelBorder draw label border
 func (i *InputField) SetLabelBorder() *InputField {
-	i.Label.DrawFrame = true
+	i.label.drawFrame = true
 	return i
 }
 
 // SetFieldBorder draw field border
 func (i *InputField) SetFieldBorder() *InputField {
-	i.Field.DrawFrame = true
+	i.field.drawFrame = true
 	return i
 }
 
 // Mask set input field to mask '*'
 func (i *InputField) SetMask() *InputField {
-	i.Field.Mask = true
+	i.field.mask = true
 	return i
 }
 
 // SetMask set or unset input field to mask '*' with key
 func (i *InputField) SetMaskKeybinding(key Key) *InputField {
-	if err := i.Gui.SetKeybinding(i.Label.Text, key, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
+	if err := i.Gui.SetKeybinding(i.label.text, key, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
 		v.Mask ^= '*'
 		return nil
 	}); err != nil {
@@ -208,14 +208,14 @@ func (i *InputField) SetCursor(b bool) *InputField {
 
 // SetEditable if editmode is true can input
 func (i *InputField) SetEditable(b bool) *InputField {
-	i.Field.Editable = b
+	i.field.editable = b
 	return i
 }
 
 // SetFocus set focus to input field
 func (i *InputField) SetFocus() {
 	i.Gui.Cursor = true
-	i.Gui.SetCurrentView(i.Label.Text)
+	i.Gui.SetCurrentView(i.label.text)
 }
 
 // Edit input field editor
@@ -234,7 +234,7 @@ func (i *InputField) Edit(v *gocui.View, key gocui.Key, ch rune, mod gocui.Modif
 	}
 
 	// get field text
-	i.Field.Text = i.cutNewline(v.Buffer())
+	i.field.text = i.cutNewline(v.Buffer())
 
 	// validate
 	i.Validate()
@@ -242,85 +242,85 @@ func (i *InputField) Edit(v *gocui.View, key gocui.Key, ch rune, mod gocui.Modif
 
 // GetFieldText get input field text
 func (i *InputField) GetFieldText() string {
-	return i.Field.Text
+	return i.field.text
 }
 
 // GetLabel get label text
 func (i *InputField) GetLabel() string {
-	return i.Label.Text
+	return i.label.text
 }
 
 // GetPosition get input field position
 func (i *InputField) GetPosition() *Position {
-	return i.Field.Position
+	return i.field.Position
 }
 
 // Validate validate input field
 func (i *InputField) Validate() bool {
-	i.Field.IsValid = i.Field.Validate(i.Field.Text)
+	i.field.isValid = i.field.validate(i.field.text)
 
-	if !i.Field.IsValid {
-		i.Field.DispValidateMsg()
+	if !i.field.isValid {
+		i.field.DispValidateMsg()
 	} else {
-		i.Field.CloseValidateMsg()
+		i.field.CloseValidateMsg()
 	}
 
-	return i.Field.IsValid
+	return i.field.isValid
 }
 
 // IsValid valid field data will be return true
 func (i *InputField) IsValid() bool {
-	return i.Field.Validator.IsValid
+	return i.field.Validator.IsValid()
 }
 
 // Draw draw label and field
 func (i *InputField) Draw() {
 	// draw label
-	x, y, w, h := i.addMargin(i.Label)
-	if v, err := i.Gui.SetView(labelPrefix+i.Label.Text, x, y, w, h); err != nil {
+	x, y, w, h := i.addMargin(i.label)
+	if v, err := i.Gui.SetView(labelPrefix+i.label.text, x, y, w, h); err != nil {
 		if err != gocui.ErrUnknownView {
 			panic(err)
 		}
 
-		v.Frame = i.Label.DrawFrame
+		v.Frame = i.label.drawFrame
 
-		v.FgColor = i.Label.TextColor | gocui.AttrBold
-		v.BgColor = i.Label.TextBgColor
+		v.FgColor = i.label.textColor | gocui.AttrBold
+		v.BgColor = i.label.textBgColor
 
-		fmt.Fprint(v, i.Label.Text)
+		fmt.Fprint(v, i.label.text)
 	}
 
 	// draw input
-	x, y, w, h = i.addMargin(i.Field)
-	if v, err := i.Gui.SetView(i.Label.Text, x, y, w, h); err != nil {
+	x, y, w, h = i.addMargin(i.field)
+	if v, err := i.Gui.SetView(i.label.text, x, y, w, h); err != nil {
 		if err != gocui.ErrUnknownView {
 			panic(err)
 		}
 
-		v.Frame = i.Field.DrawFrame
+		v.Frame = i.field.drawFrame
 		v.Highlight = true
 
-		v.BgColor = i.Field.BgColor
-		v.FgColor = i.Field.FgColor
+		v.BgColor = i.field.bgColor
+		v.FgColor = i.field.fgColor
 
-		v.SelFgColor = i.Field.TextColor
-		v.SelBgColor = i.Field.TextBgColor
+		v.SelFgColor = i.field.textColor
+		v.SelBgColor = i.field.textBgColor
 
-		v.Editable = i.Field.Editable
+		v.Editable = i.field.editable
 		v.Editor = i
 
-		if i.Field.Mask {
+		if i.field.mask {
 			v.Mask = '*'
 		}
 
 		// focus input field
-		i.Gui.SetCurrentView(i.Label.Text)
+		i.Gui.SetCurrentView(i.label.text)
 	}
 
 	// set keybindings
-	if i.Field.Handlers != nil {
-		for key, handler := range i.Field.Handlers {
-			if err := i.Gui.SetKeybinding(i.Label.Text, key, gocui.ModNone, handler); err != nil {
+	if i.field.handlers != nil {
+		for key, handler := range i.field.handlers {
+			if err := i.Gui.SetKeybinding(i.label.text, key, gocui.ModNone, handler); err != nil {
 				panic(err)
 			}
 		}
@@ -330,8 +330,8 @@ func (i *InputField) Draw() {
 // Close close input field
 func (i *InputField) Close() {
 	views := []string{
-		i.Label.Text,
-		labelPrefix + i.Label.Text,
+		i.label.text,
+		labelPrefix + i.label.text,
 	}
 
 	for _, v := range views {
@@ -342,8 +342,8 @@ func (i *InputField) Close() {
 		}
 	}
 
-	if i.Field.Handlers != nil {
-		i.DeleteKeybindings(i.Label.Text)
+	if i.field.handlers != nil {
+		i.DeleteKeybindings(i.label.text)
 	}
 }
 
@@ -351,12 +351,12 @@ func (i *InputField) addMargin(view interface{}) (int, int, int, int) {
 	switch v := view.(type) {
 	case *Field:
 		p := v.Position
-		m := v.Margin
-		return p.X + m.Left, p.Y + m.Top, p.W + m.Left, p.H + m.Top
+		m := v.margin
+		return p.x + m.left, p.y + m.top, p.w + m.left, p.h + m.top
 	case *Label:
 		p := v.Position
-		m := v.Margin
-		return p.X + m.Left, p.Y + m.Top, p.W + m.Left, p.H + m.Top
+		m := v.margin
+		return p.x + m.left, p.y + m.top, p.w + m.left, p.h + m.top
 	default:
 		panic("Unkown type")
 	}

@@ -7,11 +7,11 @@ import (
 type Form struct {
 	*gocui.Gui
 	currentView int
-	Name        string
-	Items       []*InputField
-	CheckBoxs   []*CheckBox
-	Buttons     []*Button
-	Selects     []*Select
+	name        string
+	items       []*InputField
+	checkBoxs   []*CheckBox
+	buttons     []*Button
+	selects     []*Select
 	components  []Component
 	*Position
 }
@@ -21,12 +21,12 @@ func NewForm(gui *gocui.Gui, name string, x, y, w, h int) *Form {
 	f := &Form{
 		Gui:         gui,
 		currentView: 0,
-		Name:        name,
+		name:        name,
 		Position: &Position{
-			X: x,
-			Y: y,
-			W: x + w,
-			H: y + h,
+			x: x,
+			y: y,
+			w: x + w,
+			h: y + h,
 		},
 	}
 
@@ -39,28 +39,28 @@ func (f *Form) AddInputField(label string, labelWidth, fieldWidth int) *InputFie
 
 	p := f.getLastViewPosition()
 	if p != nil {
-		y = p.H
+		y = p.h
 	} else {
-		y = f.Y
+		y = f.y
 	}
 
 	input := NewInputField(
 		f.Gui,
 		label,
-		f.X+1,
+		f.x+1,
 		y,
 		labelWidth,
 		fieldWidth,
 	)
 
-	if input.Field.H > f.H {
-		f.H = input.Field.H
+	if input.field.h > f.h {
+		f.h = input.field.h
 	}
-	if input.Field.W > f.W {
-		f.W = input.Field.W
+	if input.field.w > f.w {
+		f.w = input.field.w
 	}
 
-	f.Items = append(f.Items, input)
+	f.items = append(f.items, input)
 	f.components = append(f.components, input)
 
 	return input
@@ -74,15 +74,15 @@ func (f *Form) AddButton(label string, handler Handler) *Button {
 	p := f.getLastViewPosition()
 	if p != nil {
 		if f.isButtonLastView() {
-			x = p.W
-			y = p.Y - 1
+			x = p.w
+			y = p.y - 1
 		} else {
-			x = f.X
-			y = p.H
+			x = f.x
+			y = p.h
 		}
 	} else {
-		x = f.X
-		y = f.Y
+		x = f.x
+		y = f.y
 	}
 
 	button := NewButton(
@@ -95,14 +95,14 @@ func (f *Form) AddButton(label string, handler Handler) *Button {
 
 	button.AddHandler(gocui.KeyEnter, handler)
 
-	if button.H > f.H {
-		f.H = button.H
+	if button.h > f.h {
+		f.h = button.h
 	}
-	if button.W > f.W {
-		f.W = button.W
+	if button.w > f.w {
+		f.w = button.w
 	}
 
-	f.Buttons = append(f.Buttons, button)
+	f.buttons = append(f.buttons, button)
 	f.components = append(f.components, button)
 
 	return button
@@ -114,26 +114,26 @@ func (f *Form) AddCheckBox(label string) *CheckBox {
 
 	p := f.getLastViewPosition()
 	if p != nil {
-		y = p.H
+		y = p.h
 	} else {
-		y = f.Y
+		y = f.y
 	}
 
 	checkbox := NewCheckBox(
 		f.Gui,
 		label,
-		f.X+1,
+		f.x+1,
 		y,
 	)
 
-	if checkbox.H > f.H {
-		f.H = checkbox.H
+	if checkbox.h > f.h {
+		f.h = checkbox.h
 	}
-	if checkbox.W > f.W {
-		f.W = checkbox.W
+	if checkbox.w > f.w {
+		f.w = checkbox.w
 	}
 
-	f.CheckBoxs = append(f.CheckBoxs, checkbox)
+	f.checkBoxs = append(f.checkBoxs, checkbox)
 	f.components = append(f.components, checkbox)
 
 	return checkbox
@@ -145,28 +145,28 @@ func (f *Form) AddSelect(label string, labelWidth, listWidth int) *Select {
 
 	p := f.getLastViewPosition()
 	if p != nil {
-		y = p.H
+		y = p.h
 	} else {
-		y = f.Y
+		y = f.y
 	}
 
 	Select := NewSelect(
 		f.Gui,
 		label,
-		f.X+1,
+		f.x+1,
 		y,
 		labelWidth,
 		listWidth,
 	)
 
-	if Select.Field.H > f.H {
-		f.H = Select.Field.H
+	if Select.field.h > f.h {
+		f.h = Select.field.h
 	}
-	if Select.Field.W > f.W {
-		f.W = Select.Field.W
+	if Select.field.w > f.w {
+		f.w = Select.field.w
 	}
 
-	f.Selects = append(f.Selects, Select)
+	f.selects = append(f.selects, Select)
 	f.components = append(f.components, Select)
 
 	return Select
@@ -176,11 +176,11 @@ func (f *Form) AddSelect(label string, labelWidth, listWidth int) *Select {
 func (f *Form) GetFieldText() map[string]string {
 	data := make(map[string]string)
 
-	if len(f.Items) == 0 {
+	if len(f.items) == 0 {
 		return data
 	}
 
-	for _, item := range f.Items {
+	for _, item := range f.items {
 		data[item.GetLabel()] = item.GetFieldText()
 	}
 
@@ -191,11 +191,11 @@ func (f *Form) GetFieldText() map[string]string {
 func (f *Form) GetCheckBoxState() map[string]bool {
 	state := make(map[string]bool)
 
-	if len(f.CheckBoxs) == 0 {
+	if len(f.checkBoxs) == 0 {
 		return state
 	}
 
-	for _, box := range f.CheckBoxs {
+	for _, box := range f.checkBoxs {
 		state[box.GetLabel()] = box.IsChecked()
 	}
 
@@ -206,11 +206,11 @@ func (f *Form) GetCheckBoxState() map[string]bool {
 func (f *Form) GetSelectedOpt() map[string]string {
 	opts := make(map[string]string)
 
-	if len(f.Selects) == 0 {
+	if len(f.selects) == 0 {
 		return opts
 	}
 
-	for _, Select := range f.Selects {
+	for _, Select := range f.selects {
 		opts[Select.GetLabel()] = Select.GetSelected()
 	}
 
@@ -227,7 +227,7 @@ func (f *Form) SetCurrentItem(index int) *Form {
 // Validate validate form items
 func (f *Form) Validate() bool {
 	isValid := true
-	for _, item := range f.Items {
+	for _, item := range f.items {
 		if !item.Validate() {
 			isValid = false
 		}
@@ -245,12 +245,12 @@ func (f *Form) NextItem(g *gocui.Gui, v *gocui.View) error {
 
 // Draw form
 func (f *Form) Draw() {
-	if v, err := f.Gui.SetView(f.Name, f.X, f.Y, f.W+1, f.H+1); err != nil {
+	if v, err := f.Gui.SetView(f.name, f.x, f.y, f.w+1, f.h+1); err != nil {
 		if err != gocui.ErrUnknownView {
 			panic(err)
 		}
 
-		v.Title = f.Name
+		v.Title = f.name
 	}
 
 	for _, cp := range f.components {
@@ -265,7 +265,7 @@ func (f *Form) Draw() {
 
 // Close close form
 func (f *Form) Close() {
-	if err := f.Gui.DeleteView(f.Name); err != nil {
+	if err := f.Gui.DeleteView(f.name); err != nil {
 		if err != gocui.ErrUnknownView {
 			panic(err)
 		}

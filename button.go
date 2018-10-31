@@ -9,7 +9,6 @@ import (
 type Button struct {
 	*gocui.Gui
 	label    string
-	primary  bool
 	handlers Handlers
 	ctype    ComponentType
 	*Position

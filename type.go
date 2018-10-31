@@ -36,4 +36,5 @@ const (
 	TypeSelect
 	TypeButton
 	TypeCheckBox
+	TypeRadio
 )

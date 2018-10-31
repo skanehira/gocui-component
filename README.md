@@ -20,6 +20,6 @@ you can easily create the following components.
 - [x] Form
 - [x] Modal
 - [ ] Table
-- [ ] Radio
+- [x] Radio
 - [x] CheckBox
 - [x] Select

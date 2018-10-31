@@ -61,34 +61,28 @@ func (s *signup) regist(g *gocui.Gui, v *gocui.View) error {
 		return nil
 	}
 
-	if v, err := g.SetView("registed", 0, 0, 30, 10); err != nil {
-		if err != gocui.ErrUnknownView {
-			panic(err)
-		}
+	var text string
 
-		v.Title = v.Name()
-		v.Wrap = true
-
-		for label, text := range s.GetFieldText() {
-			fmt.Fprintf(v, "%s: %s\n", label, text)
-		}
-
-		for label, state := range s.GetCheckBoxState() {
-			fmt.Fprintf(v, "%s: %t\n", label, state)
-		}
-
-		for label, opt := range s.GetSelectedOpt() {
-			fmt.Fprintf(v, "%s: %s\n", label, opt)
-		}
-
-		g.SetCurrentView(v.Name())
-		g.SetKeybinding(v.Name(), gocui.KeyEnter, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
-			g.DeleteView(v.Name())
-			g.DeleteKeybindings(v.Name())
-			s.SetCurrentItem(0)
-			return nil
-		})
+	for label, ftext := range s.GetFieldText() {
+		text += fmt.Sprintf("%s: %s\n", label, ftext)
 	}
+
+	for label, state := range s.GetCheckBoxState() {
+		text += fmt.Sprintf("%s: %t\n", label, state)
+	}
+
+	for label, opt := range s.GetSelectedOpt() {
+		text += fmt.Sprintf("%s: %s\n", label, opt)
+	}
+
+	modal := component.NewModal(g, 0, 0, 30, 10).SetText(text)
+	modal.AddButton("OK", gocui.KeyEnter, func(g *gocui.Gui, v *gocui.View) error {
+		modal.Close()
+		s.SetCurrentItem(s.GetCurrentItem())
+		return nil
+	})
+
+	modal.Draw()
 
 	return nil
 }

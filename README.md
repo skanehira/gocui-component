@@ -18,7 +18,7 @@ you can easily create the following components.
 - [x] InputField
 - [x] Button
 - [x] Form
-- [ ] Dialog
+- [x] Modal
 - [ ] Table
 - [ ] Radio
 - [x] CheckBox

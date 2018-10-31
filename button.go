@@ -8,11 +8,12 @@ import (
 
 type Button struct {
 	*gocui.Gui
-	label   string
-	primary bool
+	label    string
+	primary  bool
+	handlers Handlers
+	ctype    ComponentType
 	*Position
 	*Attributes
-	handlers Handlers
 }
 
 // NewButton new button
@@ -31,10 +32,13 @@ func NewButton(gui *gocui.Gui, label string, x, y, width int) *Button {
 			y + 2,
 		},
 		Attributes: &Attributes{
-			fgColor: gocui.ColorWhite | gocui.AttrBold,
-			bgColor: gocui.ColorBlue,
+			textColor:      gocui.ColorWhite | gocui.AttrBold,
+			textBgColor:    gocui.ColorBlue,
+			hilightColor:   gocui.ColorBlue | gocui.AttrBold,
+			hilightBgColor: gocui.ColorWhite,
 		},
 		handlers: make(Handlers),
+		ctype:    TypeButton,
 	}
 
 	return b
@@ -46,10 +50,17 @@ func (b *Button) AddHandler(key Key, handler Handler) *Button {
 	return b
 }
 
-// AddAttribute add button fg and bg color
-func (b *Button) AddAttribute(fgColor, bgColor gocui.Attribute) *Button {
-	b.fgColor = fgColor
-	b.bgColor = bgColor
+// SetTextColor add button fg and bg color
+func (b *Button) SetTextColor(fgColor, bgColor gocui.Attribute) *Button {
+	b.textColor = fgColor
+	b.textBgColor = bgColor
+	return b
+}
+
+// SetHilightColor add button fg and bg color
+func (b *Button) SetHilightColor(fgColor, bgColor gocui.Attribute) *Button {
+	b.hilightColor = fgColor
+	b.hilightBgColor = bgColor
 	return b
 }
 
@@ -63,10 +74,22 @@ func (b *Button) GetPosition() *Position {
 	return b.Position
 }
 
-// SetFocus set focus to button
-func (b *Button) SetFocus() {
-	b.Gui.Cursor = true
-	b.Gui.SetCurrentView(b.GetLabel())
+// Focus focus to button
+func (b *Button) Focus() {
+	b.Gui.Cursor = false
+	v, _ := b.Gui.SetCurrentView(b.label)
+	v.Highlight = true
+}
+
+// UnFocus un focus
+func (b *Button) UnFocus() {
+	v, _ := b.Gui.View(b.label)
+	v.Highlight = false
+}
+
+// GetType get component type
+func (b *Button) GetType() ComponentType {
+	return b.ctype
 }
 
 // Draw draw button
@@ -78,10 +101,11 @@ func (b *Button) Draw() {
 
 		v.Frame = false
 
-		v.FgColor = b.fgColor
-		v.BgColor = b.bgColor
+		v.FgColor = b.textColor
+		v.BgColor = b.textBgColor
 
-		b.Gui.SetCurrentView(b.label)
+		v.SelFgColor = b.hilightColor
+		v.SelBgColor = b.hilightBgColor
 
 		fmt.Fprint(v, fmt.Sprintf(" %s ", b.label))
 	}

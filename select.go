@@ -11,6 +11,7 @@ type Select struct {
 	options      []string
 	currentOpt   int
 	isExpanded   bool
+	ctype        ComponentType
 	listColor    *Attributes
 	listHandlers Handlers
 }
@@ -21,6 +22,7 @@ func NewSelect(gui *gocui.Gui, label string, x, y, labelWidth, fieldWidth int) *
 	s := &Select{
 		InputField:   NewInputField(gui, label, x, y, labelWidth, fieldWidth),
 		listHandlers: make(Handlers),
+		ctype:        TypeSelect,
 	}
 
 	s.AddHandler(gocui.KeyEnter, s.expandOpt)
@@ -44,10 +46,10 @@ func (s *Select) AddOptions(opts ...string) *Select {
 // AddAttribute add select attribute
 func (s *Select) AddAttribute(textColor, textBgColor, fgColor, bgColor gocui.Attribute) *Select {
 	s.listColor = &Attributes{
-		textColor:   textColor,
-		textBgColor: textBgColor,
-		fgColor:     fgColor,
-		bgColor:     bgColor,
+		textColor:      textColor,
+		textBgColor:    textBgColor,
+		hilightColor:   fgColor,
+		hilightBgColor: bgColor,
 	}
 
 	return s
@@ -64,10 +66,20 @@ func (s *Select) GetSelected() string {
 	return s.options[s.currentOpt]
 }
 
-// SetFocus set focus to select
-func (s *Select) SetFocus() {
+// Focus set focus to select
+func (s *Select) Focus() {
 	s.Gui.Cursor = true
 	s.Gui.SetCurrentView(s.GetLabel())
+}
+
+// UnFocus un focus
+func (s *Select) UnFocus() {
+	s.Gui.Cursor = false
+}
+
+// GetType get component type
+func (s *Select) GetType() ComponentType {
+	return s.ctype
 }
 
 // Draw draw select
@@ -149,8 +161,8 @@ func (s *Select) expandOpt(g *gocui.Gui, vi *gocui.View) error {
 				v.Frame = false
 				v.SelFgColor = s.listColor.textColor
 				v.SelBgColor = s.listColor.textBgColor
-				v.FgColor = s.listColor.fgColor
-				v.BgColor = s.listColor.bgColor
+				v.FgColor = s.listColor.hilightColor
+				v.BgColor = s.listColor.hilightBgColor
 
 				for key, handler := range s.listHandlers {
 					if err := g.SetKeybinding(v.Name(), key, gocui.ModNone, handler); err != nil {

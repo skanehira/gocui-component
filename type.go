@@ -7,22 +7,33 @@ type Handler func(g *gocui.Gui, v *gocui.View) error
 type Handlers map[Key]Handler
 
 type Component interface {
-	Close()
 	GetLabel() string
 	GetPosition() *Position
-	SetFocus()
+	GetType() ComponentType
+	Focus()
+	UnFocus()
 	Draw()
+	Close()
 	addHandlerOnly(Key, Handler)
 }
 
 type Attributes struct {
-	textColor   gocui.Attribute
-	textBgColor gocui.Attribute
-	fgColor     gocui.Attribute
-	bgColor     gocui.Attribute
+	textColor      gocui.Attribute
+	textBgColor    gocui.Attribute
+	hilightColor   gocui.Attribute
+	hilightBgColor gocui.Attribute
 }
 
 type Position struct {
 	x, y int
 	w, h int
 }
+
+type ComponentType int
+
+const (
+	TypeInputField ComponentType = iota
+	TypeSelect
+	TypeButton
+	TypeCheckBox
+)

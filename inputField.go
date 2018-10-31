@@ -31,12 +31,13 @@ type Field struct {
 	text      string
 	width     int
 	drawFrame bool
+	handlers  Handlers
+	margin    *Margin
+	mask      bool
+	editable  bool
+	ctype     ComponentType
 	*Position
 	*Attributes
-	handlers Handlers
-	margin   *Margin
-	mask     bool
-	editable bool
 	*Validator
 }
 
@@ -85,8 +86,6 @@ func NewInputField(gui *gocui.Gui, labelText string, x, y, labelWidth, fieldWidt
 		Attributes: &Attributes{
 			textColor:   gocui.ColorBlack,
 			textBgColor: gocui.ColorCyan,
-			fgColor:     gocui.ColorBlack,
-			bgColor:     gocui.ColorCyan,
 		},
 		handlers:  make(Handlers),
 		drawFrame: false,
@@ -106,6 +105,7 @@ func NewInputField(gui *gocui.Gui, labelText string, x, y, labelWidth, fieldWidt
 			},
 		},
 		editable: true,
+		ctype:    TypeInputField,
 	}
 
 	// new input field
@@ -121,10 +121,10 @@ func NewInputField(gui *gocui.Gui, labelText string, x, y, labelWidth, fieldWidt
 // AddFieldTextAttribute add field colors
 func (i *InputField) AddFieldAttribute(textColor, textBgColor, fgColor, bgColor gocui.Attribute) *InputField {
 	i.field.Attributes = &Attributes{
-		textColor:   textColor,
-		textBgColor: textBgColor,
-		fgColor:     fgColor,
-		bgColor:     bgColor,
+		textColor:      textColor,
+		textBgColor:    textBgColor,
+		hilightColor:   fgColor,
+		hilightBgColor: bgColor,
 	}
 	return i
 }
@@ -212,10 +212,15 @@ func (i *InputField) SetEditable(b bool) *InputField {
 	return i
 }
 
-// SetFocus set focus to input field
-func (i *InputField) SetFocus() {
+// Focus focus to input field
+func (i *InputField) Focus() {
 	i.Gui.Cursor = true
 	i.Gui.SetCurrentView(i.label.text)
+}
+
+// UnFocus un focus
+func (i *InputField) UnFocus() {
+	i.Gui.Cursor = false
 }
 
 // Edit input field editor
@@ -273,6 +278,11 @@ func (i *InputField) IsValid() bool {
 	return i.field.Validator.IsValid()
 }
 
+// GetType get component type
+func (i *InputField) GetType() ComponentType {
+	return i.field.ctype
+}
+
 // Draw draw label and field
 func (i *InputField) Draw() {
 	// draw label
@@ -298,13 +308,9 @@ func (i *InputField) Draw() {
 		}
 
 		v.Frame = i.field.drawFrame
-		v.Highlight = true
 
-		v.BgColor = i.field.bgColor
-		v.FgColor = i.field.fgColor
-
-		v.SelFgColor = i.field.textColor
-		v.SelBgColor = i.field.textBgColor
+		v.FgColor = i.field.textColor
+		v.BgColor = i.field.textBgColor
 
 		v.Editable = i.field.editable
 		v.Editor = i

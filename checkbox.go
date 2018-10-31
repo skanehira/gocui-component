@@ -11,6 +11,7 @@ type CheckBox struct {
 	label     string
 	isChecked bool
 	box       *box
+	ctype     ComponentType
 	*Position
 	*Attributes
 	handlers Handlers
@@ -54,6 +55,7 @@ func NewCheckBox(gui *gocui.Gui, label string, x, y int) *CheckBox {
 			},
 		},
 		handlers: make(Handlers),
+		ctype:    TypeCheckBox,
 	}
 
 	c.handlers[gocui.KeyEnter] = c.Check
@@ -105,10 +107,20 @@ func (c *CheckBox) IsChecked() bool {
 	return c.isChecked
 }
 
-// SetFocus set focus to checkbox
-func (c *CheckBox) SetFocus() {
+// Focus focus to  checkbox
+func (c *CheckBox) Focus() {
 	c.Gui.Cursor = true
 	c.Gui.SetCurrentView(c.GetLabel())
+}
+
+// Focus un focus
+func (c *CheckBox) UnFocus() {
+	c.Gui.Cursor = false
+}
+
+// GetType get component type
+func (c *CheckBox) GetType() ComponentType {
+	return c.ctype
 }
 
 // Draw draw label and checkbox

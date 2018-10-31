@@ -220,8 +220,13 @@ func (f *Form) GetSelectedOpt() map[string]string {
 // SetCurretnItem set current item index
 func (f *Form) SetCurrentItem(index int) *Form {
 	f.currentItem = index
-	f.components[index].SetFocus()
+	f.components[index].Focus()
 	return f
+}
+
+// GetCurrentItem get current item index
+func (f *Form) GetCurrentItem() int {
+	return f.currentItem
 }
 
 // Validate validate form items
@@ -238,8 +243,9 @@ func (f *Form) Validate() bool {
 
 // NextItem to next item
 func (f *Form) NextItem(g *gocui.Gui, v *gocui.View) error {
+	f.components[f.currentItem].UnFocus()
 	f.currentItem = (f.currentItem + 1) % len(f.components)
-	f.components[f.currentItem].SetFocus()
+	f.components[f.currentItem].Focus()
 	return nil
 }
 
@@ -259,7 +265,7 @@ func (f *Form) Draw() {
 	}
 
 	if len(f.components) != 0 {
-		f.components[0].SetFocus()
+		f.components[0].Focus()
 	}
 }
 
@@ -291,10 +297,5 @@ func (f *Form) isButtonLastView() bool {
 		return false
 	}
 
-	_, ok := f.components[cpl-1].(*Button)
-	return ok
-}
-
-func (f *Form) addHandlerOnly(key Key, handler Handler) {
-	// do nothing
+	return f.components[cpl-1].GetType() == TypeButton
 }

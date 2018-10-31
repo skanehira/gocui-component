@@ -129,7 +129,6 @@ func (s *Select) selectOpt(g *gocui.Gui, v *gocui.View) error {
 
 func (s *Select) expandOpt(g *gocui.Gui, vi *gocui.View) error {
 	if s.hasOpts() {
-		s.currentOpt = 0
 		s.isExpanded = true
 		g.Cursor = false
 
@@ -139,7 +138,7 @@ func (s *Select) expandOpt(g *gocui.Gui, vi *gocui.View) error {
 		y := s.field.y
 		h := y + 2
 
-		for i, opt := range s.options {
+		for _, opt := range s.options {
 			y++
 			h++
 			if v, err := g.SetView(opt, x, y, w, h); err != nil {
@@ -148,7 +147,6 @@ func (s *Select) expandOpt(g *gocui.Gui, vi *gocui.View) error {
 				}
 
 				v.Frame = false
-
 				v.SelFgColor = s.listColor.textColor
 				v.SelBgColor = s.listColor.textBgColor
 				v.FgColor = s.listColor.fgColor
@@ -161,14 +159,12 @@ func (s *Select) expandOpt(g *gocui.Gui, vi *gocui.View) error {
 				}
 
 				fmt.Fprint(v, opt)
-
-				if i == 0 {
-					g.SetCurrentView(opt)
-					v.Highlight = true
-				}
 			}
 
 		}
+
+		v, _ := g.SetCurrentView(s.options[s.currentOpt])
+		v.Highlight = true
 	}
 
 	return nil

@@ -6,7 +6,7 @@ import (
 
 type Form struct {
 	*gocui.Gui
-	currentView int
+	currentItem int
 	name        string
 	items       []*InputField
 	checkBoxs   []*CheckBox
@@ -20,7 +20,7 @@ type Form struct {
 func NewForm(gui *gocui.Gui, name string, x, y, w, h int) *Form {
 	f := &Form{
 		Gui:         gui,
-		currentView: 0,
+		currentItem: 0,
 		name:        name,
 		Position: &Position{
 			x: x,
@@ -219,7 +219,7 @@ func (f *Form) GetSelectedOpt() map[string]string {
 
 // SetCurretnItem set current item index
 func (f *Form) SetCurrentItem(index int) *Form {
-	f.currentView = index
+	f.currentItem = index
 	f.components[index].SetFocus()
 	return f
 }
@@ -238,8 +238,8 @@ func (f *Form) Validate() bool {
 
 // NextItem to next item
 func (f *Form) NextItem(g *gocui.Gui, v *gocui.View) error {
-	f.currentView = (f.currentView + 1) % len(f.components)
-	f.components[f.currentView].SetFocus()
+	f.currentItem = (f.currentItem + 1) % len(f.components)
+	f.components[f.currentItem].SetFocus()
 	return nil
 }
 

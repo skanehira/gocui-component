@@ -14,7 +14,7 @@ type Component interface {
 	UnFocus()
 	Draw()
 	Close()
-	addHandlerOnly(Key, Handler)
+	AddHandlerOnly(Key, Handler)
 }
 
 type Attributes struct {

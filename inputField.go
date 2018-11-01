@@ -200,6 +200,12 @@ func (i *InputField) SetMaskKeybinding(key Key) *InputField {
 	return i
 }
 
+// SetText set text
+func (i *InputField) SetText(text string) *InputField {
+	i.field.text = text
+	return i
+}
+
 // SetCursor set input field cursor
 func (i *InputField) SetCursor(b bool) *InputField {
 	i.Gui.Cursor = b
@@ -319,8 +325,12 @@ func (i *InputField) Draw() {
 			v.Mask = '*'
 		}
 
+		if i.field.text != "" {
+			fmt.Fprint(v, i.field.text)
+		}
+
 		// focus input field
-		i.Gui.SetCurrentView(i.label.text)
+		i.Focus()
 	}
 
 	// set keybindings
@@ -372,6 +382,6 @@ func (i *InputField) cutNewline(text string) string {
 	return strings.Replace(text, "\n", "", -1)
 }
 
-func (i *InputField) addHandlerOnly(key Key, handler Handler) {
+func (i *InputField) AddHandlerOnly(key Key, handler Handler) {
 	i.AddHandler(key, handler)
 }

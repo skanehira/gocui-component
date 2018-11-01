@@ -132,6 +132,6 @@ func (b *Button) Close() {
 	}
 }
 
-func (b *Button) addHandlerOnly(key Key, handler Handler) {
+func (b *Button) AddHandlerOnly(key Key, handler Handler) {
 	b.handlers[key] = handler
 }

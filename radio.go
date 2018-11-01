@@ -148,6 +148,6 @@ func (r *Radio) Close() {
 	}
 }
 
-func (r *Radio) addHandlerOnly(key Key, handler Handler) {
+func (r *Radio) AddHandlerOnly(key Key, handler Handler) {
 	r.handlers[key] = handler
 }

@@ -272,6 +272,36 @@ func (f *Form) GetFormData() *FormData {
 	return fd
 }
 
+// GetInputs get inputs
+func (f *Form) GetInputs() []*InputField {
+	return f.inputs
+}
+
+// GetCheckBoxs get checkboxs
+func (f *Form) GetCheckBoxs() []*CheckBox {
+	return f.checkBoxs
+}
+
+// GetButtons get buttons
+func (f *Form) GetButtons() []*Button {
+	return f.buttons
+}
+
+// GetSelects get selects
+func (f *Form) GetSelects() []*Select {
+	return f.selects
+}
+
+// GetRadios get radios
+func (f *Form) GetRadios() []*Radio {
+	return f.radios
+}
+
+// GetItems get items
+func (f *Form) GetItems() []Component {
+	return f.components
+}
+
 // SetCurretnItem set current item index
 func (f *Form) SetCurrentItem(index int) *Form {
 	f.activeItem = index
@@ -330,13 +360,13 @@ func (f *Form) Draw() {
 	}
 
 	for _, cp := range f.components {
-		cp.addHandlerOnly(gocui.KeyTab, f.NextItem)
-		cp.addHandlerOnly(gocui.KeyArrowDown, f.NextItem)
-		cp.addHandlerOnly(gocui.KeyArrowUp, f.PreItem)
+		cp.AddHandlerOnly(gocui.KeyTab, f.NextItem)
+		cp.AddHandlerOnly(gocui.KeyArrowDown, f.NextItem)
+		cp.AddHandlerOnly(gocui.KeyArrowUp, f.PreItem)
 
 		if cp.GetType() == TypeRadio {
-			cp.addHandlerOnly(gocui.KeyEnter, f.checkRadioButton)
-			cp.addHandlerOnly(gocui.KeySpace, f.checkRadioButton)
+			cp.AddHandlerOnly(gocui.KeyEnter, f.checkRadioButton)
+			cp.AddHandlerOnly(gocui.KeySpace, f.checkRadioButton)
 		}
 
 		cp.Draw()

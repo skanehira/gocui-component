@@ -176,6 +176,6 @@ func (c *CheckBox) Close() {
 	c.DeleteKeybindings(c.box.name)
 }
 
-func (c *CheckBox) addHandlerOnly(key Key, handler Handler) {
+func (c *CheckBox) AddHandlerOnly(key Key, handler Handler) {
 	c.AddHandler(key, handler)
 }

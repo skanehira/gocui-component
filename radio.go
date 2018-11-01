@@ -75,24 +75,37 @@ func (r *Radio) GetType() ComponentType {
 // Focus focus to radio
 func (r *Radio) Focus() {
 	r.Gui.Cursor = false
-	r.isChecked = true
-
 	v, _ := r.Gui.SetCurrentView(r.label)
 	v.Highlight = true
-
-	v.Clear()
-	fmt.Fprint(v, r.checked)
 }
 
 // UnFocus un focus radio
 func (r *Radio) UnFocus() {
-	r.isChecked = false
-
 	v, _ := r.Gui.View(r.label)
 	v.Highlight = false
+}
 
+// Check check radio button
+func (r *Radio) Check(g *gocui.Gui, v *gocui.View) error {
+	r.isChecked = true
+	v.Clear()
+	fmt.Fprint(v, r.checked)
+
+	return nil
+}
+
+// UnCheck uncheck radio button
+func (r *Radio) UnCheck(g *gocui.Gui, v *gocui.View) error {
+	r.isChecked = false
 	v.Clear()
 	fmt.Fprint(v, r.unCheck)
+
+	return nil
+}
+
+// IsChecked return check state
+func (r *Radio) IsChecked() bool {
+	return r.isChecked
 }
 
 // Draw draw radio
@@ -110,7 +123,7 @@ func (r *Radio) Draw() {
 		v.SelFgColor = r.hilightColor
 		v.SelBgColor = r.hilightBgColor
 
-		r.UnFocus()
+		fmt.Fprint(v, r.unCheck)
 	}
 
 	if r.handlers != nil {

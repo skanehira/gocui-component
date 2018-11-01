@@ -37,13 +37,25 @@ func main() {
 	signup.AddInputField("Password", 11, 18).
 		AddValidator("required input", requireValidator).
 		SetMask().
-		SetMaskKeybinding(gocui.KeyCtrlM)
+		SetMaskKeybinding(gocui.KeyCtrlA)
 
 	// add checkbox
 	signup.AddCheckBox("Age 18+")
 
 	// add select
 	signup.AddSelect("Language", 10, 10).AddOptions("Japanese", "English", "Chinese")
+
+	// add radio
+	radios := []string{
+		"Go",
+		"Java",
+		"PHP",
+		"Python",
+	}
+
+	for _, r := range radios {
+		signup.AddRadio(r)
+	}
 
 	// add button
 	signup.AddButton("Regist", signup.regist)
@@ -75,7 +87,9 @@ func (s *signup) regist(g *gocui.Gui, v *gocui.View) error {
 		text += fmt.Sprintf("%s: %s\n", label, opt)
 	}
 
-	modal := component.NewModal(g, 0, 0, 30, 10).SetText(text)
+	text += fmt.Sprintf("radio: %s\n", s.GetRadioText())
+
+	modal := component.NewModal(g, 0, 0, 30, 15).SetText(text)
 	modal.AddButton("OK", gocui.KeyEnter, func(g *gocui.Gui, v *gocui.View) error {
 		modal.Close()
 		s.SetCurrentItem(s.GetCurrentItem())

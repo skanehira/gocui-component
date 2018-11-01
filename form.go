@@ -6,22 +6,31 @@ import (
 
 type Form struct {
 	*gocui.Gui
-	currentItem int
+	activeItem  int
+	activeRadio int
 	name        string
-	items       []*InputField
+	inputs      []*InputField
 	checkBoxs   []*CheckBox
 	buttons     []*Button
 	selects     []*Select
+	radios      []*Radio
 	components  []Component
 	*Position
+}
+
+type FormData struct {
+	inputs    map[string]string
+	checkBoxs map[string]bool
+	selects   map[string]string
+	radio     string
 }
 
 // NewForm new form
 func NewForm(gui *gocui.Gui, name string, x, y, w, h int) *Form {
 	f := &Form{
-		Gui:         gui,
-		currentItem: 0,
-		name:        name,
+		Gui:        gui,
+		activeItem: 0,
+		name:       name,
 		Position: &Position{
 			x: x,
 			y: y,
@@ -60,7 +69,7 @@ func (f *Form) AddInputField(label string, labelWidth, fieldWidth int) *InputFie
 		f.w = input.field.w
 	}
 
-	f.items = append(f.items, input)
+	f.inputs = append(f.inputs, input)
 	f.components = append(f.components, input)
 
 	return input
@@ -172,15 +181,40 @@ func (f *Form) AddSelect(label string, labelWidth, listWidth int) *Select {
 	return Select
 }
 
+func (f *Form) AddRadio(label string) *Radio {
+	var y int
+
+	p := f.getLastViewPosition()
+	if p != nil {
+		y = p.h
+	} else {
+		y = f.y
+	}
+
+	radio := NewRadio(f.Gui, label, f.x+1, y)
+
+	if radio.h > f.h {
+		f.h = radio.h
+	}
+	if radio.w > f.w {
+		f.w = radio.w
+	}
+
+	f.radios = append(f.radios, radio)
+	f.components = append(f.components, radio)
+
+	return radio
+}
+
 // GetFormData get form data
 func (f *Form) GetFieldText() map[string]string {
 	data := make(map[string]string)
 
-	if len(f.items) == 0 {
+	if len(f.inputs) == 0 {
 		return data
 	}
 
-	for _, item := range f.items {
+	for _, item := range f.inputs {
 		data[item.GetLabel()] = item.GetFieldText()
 	}
 
@@ -217,22 +251,43 @@ func (f *Form) GetSelectedOpt() map[string]string {
 	return opts
 }
 
+// GetRadio get radio text
+func (f *Form) GetRadioText() string {
+	if len(f.radios) == 0 {
+		return ""
+	}
+
+	return f.radios[f.activeRadio].GetLabel()
+}
+
+// GetFormData get form data
+func (f *Form) GetFormData() *FormData {
+	fd := &FormData{
+		inputs:    f.GetFieldText(),
+		checkBoxs: f.GetCheckBoxState(),
+		selects:   f.GetSelectedOpt(),
+		radio:     f.GetRadioText(),
+	}
+
+	return fd
+}
+
 // SetCurretnItem set current item index
 func (f *Form) SetCurrentItem(index int) *Form {
-	f.currentItem = index
+	f.activeItem = index
 	f.components[index].Focus()
 	return f
 }
 
 // GetCurrentItem get current item index
 func (f *Form) GetCurrentItem() int {
-	return f.currentItem
+	return f.activeItem
 }
 
 // Validate validate form items
 func (f *Form) Validate() bool {
 	isValid := true
-	for _, item := range f.items {
+	for _, item := range f.inputs {
 		if !item.Validate() {
 			isValid = false
 		}
@@ -243,9 +298,24 @@ func (f *Form) Validate() bool {
 
 // NextItem to next item
 func (f *Form) NextItem(g *gocui.Gui, v *gocui.View) error {
-	f.components[f.currentItem].UnFocus()
-	f.currentItem = (f.currentItem + 1) % len(f.components)
-	f.components[f.currentItem].Focus()
+	f.components[f.activeItem].UnFocus()
+	f.activeItem = (f.activeItem + 1) % len(f.components)
+	f.components[f.activeItem].Focus()
+	return nil
+}
+
+// PreItem to pre item
+func (f *Form) PreItem(g *gocui.Gui, v *gocui.View) error {
+	f.components[f.activeItem].UnFocus()
+
+	if f.activeItem-1 < 0 {
+		f.activeItem = len(f.components) - 1
+	} else {
+		f.activeItem = (f.activeItem - 1) % len(f.components)
+	}
+
+	f.components[f.activeItem].Focus()
+
 	return nil
 }
 
@@ -261,6 +331,14 @@ func (f *Form) Draw() {
 
 	for _, cp := range f.components {
 		cp.addHandlerOnly(gocui.KeyTab, f.NextItem)
+		cp.addHandlerOnly(gocui.KeyArrowDown, f.NextItem)
+		cp.addHandlerOnly(gocui.KeyArrowUp, f.PreItem)
+
+		if cp.GetType() == TypeRadio {
+			cp.addHandlerOnly(gocui.KeyEnter, f.checkRadioButton)
+			cp.addHandlerOnly(gocui.KeySpace, f.checkRadioButton)
+		}
+
 		cp.Draw()
 	}
 
@@ -298,4 +376,16 @@ func (f *Form) isButtonLastView() bool {
 	}
 
 	return f.components[cpl-1].GetType() == TypeButton
+}
+
+func (f *Form) checkRadioButton(g *gocui.Gui, v *gocui.View) error {
+	radio := f.components[f.activeItem].(*Radio)
+
+	for _, r := range f.radios {
+		v, _ := f.Gui.View(r.GetLabel())
+		r.UnCheck(g, v)
+	}
+
+	radio.Check(g, v)
+	return nil
 }

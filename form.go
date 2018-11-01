@@ -50,7 +50,7 @@ func (f *Form) AddInputField(label string, labelWidth, fieldWidth int) *InputFie
 	if p != nil {
 		y = p.h
 	} else {
-		y = f.y
+		y = f.y + 1
 	}
 
 	input := NewInputField(

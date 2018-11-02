@@ -26,10 +26,10 @@ type Radio struct {
 // NewRadio new radio
 func NewRadio(gui *gocui.Gui, label string, x, y int) *Radio {
 	p := &Position{
-		x: x,
-		y: y,
-		w: x + len(label) + 7,
-		h: y + 2,
+		X: x,
+		Y: y,
+		W: x + len(label) + 7,
+		H: y + 2,
 	}
 
 	r := &Radio{
@@ -110,7 +110,7 @@ func (r *Radio) IsChecked() bool {
 
 // Draw draw radio
 func (r *Radio) Draw() {
-	if v, err := r.Gui.SetView(r.label, r.x, r.y, r.w, r.h); err != nil {
+	if v, err := r.Gui.SetView(r.label, r.X, r.Y, r.W, r.H); err != nil {
 		if err != gocui.ErrUnknownView {
 			panic(err)
 		}

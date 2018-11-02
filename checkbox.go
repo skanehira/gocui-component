@@ -24,17 +24,20 @@ type box struct {
 }
 
 // NewCheckBox new checkbox
-func NewCheckBox(gui *gocui.Gui, label string, x, y int) *CheckBox {
+func NewCheckBox(gui *gocui.Gui, label string, x, y, labelWidth int) *CheckBox {
+	if len(label) > labelWidth {
+		labelWidth = len(label)
+	}
 	p := &Position{
-		x: x,
-		y: y,
-		w: x + len(label) + 1,
-		h: y + 2,
+		X: x,
+		Y: y,
+		W: x + labelWidth + 1,
+		H: y + 2,
 	}
 
 	c := &CheckBox{
 		Gui:       gui,
-		label:     label + "box",
+		label:     label,
 		isChecked: false,
 		Position:  p,
 		Attributes: &Attributes{
@@ -42,12 +45,12 @@ func NewCheckBox(gui *gocui.Gui, label string, x, y int) *CheckBox {
 			textBgColor: gocui.ColorDefault,
 		},
 		box: &box{
-			name: label,
+			name: label + "box",
 			Position: &Position{
-				x: p.w,
-				y: p.y,
-				w: p.w + 2,
-				h: p.h,
+				X: p.W,
+				Y: p.Y,
+				W: p.W + 2,
+				H: p.H,
 			},
 			Attributes: &Attributes{
 				textColor:   gocui.ColorBlack,
@@ -126,7 +129,7 @@ func (c *CheckBox) GetType() ComponentType {
 // Draw draw label and checkbox
 func (c *CheckBox) Draw() {
 	// draw label
-	if v, err := c.Gui.SetView(c.label, c.x, c.y, c.w, c.h); err != nil {
+	if v, err := c.Gui.SetView(c.label, c.X, c.Y, c.W, c.H); err != nil {
 		if err != gocui.ErrUnknownView {
 			panic(err)
 		}
@@ -139,7 +142,7 @@ func (c *CheckBox) Draw() {
 
 	// draw checkbox
 	b := c.box
-	if v, err := c.Gui.SetView(b.name, b.x, b.y, b.w, b.h); err != nil {
+	if v, err := c.Gui.SetView(b.name, b.X, b.Y, b.W, b.H); err != nil {
 		if err != gocui.ErrUnknownView {
 			panic(err)
 		}

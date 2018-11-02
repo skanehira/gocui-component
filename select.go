@@ -144,10 +144,10 @@ func (s *Select) expandOpt(g *gocui.Gui, vi *gocui.View) error {
 		s.isExpanded = true
 		g.Cursor = false
 
-		x := s.field.x
-		w := s.field.w
+		x := s.field.X
+		w := s.field.W
 
-		y := s.field.y
+		y := s.field.Y
 		h := y + 2
 
 		for _, opt := range s.options {

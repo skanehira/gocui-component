@@ -19,7 +19,7 @@ type Validator struct {
 
 // DispValidateMsg display validate error message
 func (v *Validator) DispValidateMsg() {
-	if vi, err := v.SetView(v.name, v.x, v.y, v.w, v.h); err != nil {
+	if vi, err := v.SetView(v.name, v.X, v.Y, v.W, v.H); err != nil {
 		if err != gocui.ErrUnknownView {
 			panic(err)
 		}

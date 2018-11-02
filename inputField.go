@@ -57,10 +57,10 @@ func NewInputField(gui *gocui.Gui, labelText string, x, y, labelWidth, fieldWidt
 
 	// field position
 	fp := &Position{
-		lp.w,
-		lp.y,
-		lp.w + fieldWidth,
-		lp.h,
+		lp.W,
+		lp.Y,
+		lp.W + fieldWidth,
+		lp.H,
 	}
 
 	// new label
@@ -98,10 +98,10 @@ func NewInputField(gui *gocui.Gui, labelText string, x, y, labelWidth, fieldWidt
 			name:     label.text + "errMsg",
 			validate: func(text string) bool { return true },
 			Position: &Position{
-				x: fp.x,
-				y: fp.y + 1,
-				w: fp.w,
-				h: fp.h + 1,
+				X: fp.X,
+				Y: fp.Y + 1,
+				W: fp.W,
+				H: fp.H + 1,
 			},
 		},
 		editable: true,
@@ -164,8 +164,8 @@ func (i *InputField) AddValidator(errMsg string, validate Validate) *InputField 
 	v := i.field.Validator
 	v.errMsg = errMsg
 	v.validate = validate
-	if v.x+len(errMsg) > v.w {
-		v.w += len(errMsg)
+	if v.X+len(errMsg) > v.W {
+		v.W += len(errMsg)
 	}
 	return i
 }
@@ -372,11 +372,11 @@ func (i *InputField) addMargin(view interface{}) (int, int, int, int) {
 	case *Field:
 		p := v.Position
 		m := v.margin
-		return p.x + m.left, p.y + m.top, p.w + m.left, p.h + m.top
+		return p.X + m.left, p.Y + m.top, p.W + m.left, p.H + m.top
 	case *Label:
 		p := v.Position
 		m := v.margin
-		return p.x + m.left, p.y + m.top, p.w + m.left, p.h + m.top
+		return p.X + m.left, p.Y + m.top, p.W + m.left, p.H + m.top
 	default:
 		panic("Unkown type")
 	}

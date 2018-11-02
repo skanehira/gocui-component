@@ -32,10 +32,10 @@ func NewForm(gui *gocui.Gui, name string, x, y, w, h int) *Form {
 		activeItem: 0,
 		name:       name,
 		Position: &Position{
-			x: x,
-			y: y,
-			w: x + w,
-			h: y + h,
+			X: x,
+			Y: y,
+			W: x + w,
+			H: y + h,
 		},
 	}
 
@@ -48,25 +48,25 @@ func (f *Form) AddInputField(label string, labelWidth, fieldWidth int) *InputFie
 
 	p := f.getLastViewPosition()
 	if p != nil {
-		y = p.h
+		y = p.H
 	} else {
-		y = f.y + 1
+		y = f.Y + 1
 	}
 
 	input := NewInputField(
 		f.Gui,
 		label,
-		f.x+1,
+		f.X+1,
 		y,
 		labelWidth,
 		fieldWidth,
 	)
 
-	if input.field.h > f.h {
-		f.h = input.field.h
+	if input.field.H > f.H {
+		f.H = input.field.H
 	}
-	if input.field.w > f.w {
-		f.w = input.field.w
+	if input.field.W > f.W {
+		f.W = input.field.W
 	}
 
 	f.inputs = append(f.inputs, input)
@@ -83,15 +83,15 @@ func (f *Form) AddButton(label string, handler Handler) *Button {
 	p := f.getLastViewPosition()
 	if p != nil {
 		if f.isButtonLastView() {
-			x = p.w
-			y = p.y - 1
+			x = p.W
+			y = p.Y - 1
 		} else {
-			x = f.x
-			y = p.h
+			x = f.X
+			y = p.H
 		}
 	} else {
-		x = f.x
-		y = f.y
+		x = f.X
+		y = f.Y
 	}
 
 	button := NewButton(
@@ -104,11 +104,11 @@ func (f *Form) AddButton(label string, handler Handler) *Button {
 
 	button.AddHandler(gocui.KeyEnter, handler)
 
-	if button.h > f.h {
-		f.h = button.h
+	if button.H > f.H {
+		f.H = button.H
 	}
-	if button.w > f.w {
-		f.w = button.w
+	if button.W > f.W {
+		f.W = button.W
 	}
 
 	f.buttons = append(f.buttons, button)
@@ -118,28 +118,29 @@ func (f *Form) AddButton(label string, handler Handler) *Button {
 }
 
 // AddCheckBox add checkbox
-func (f *Form) AddCheckBox(label string) *CheckBox {
+func (f *Form) AddCheckBox(label string, width int) *CheckBox {
 	var y int
 
 	p := f.getLastViewPosition()
 	if p != nil {
-		y = p.h
+		y = p.H
 	} else {
-		y = f.y
+		y = f.Y
 	}
 
 	checkbox := NewCheckBox(
 		f.Gui,
 		label,
-		f.x+1,
+		f.X+1,
 		y,
+		width,
 	)
 
-	if checkbox.h > f.h {
-		f.h = checkbox.h
+	if checkbox.H > f.H {
+		f.H = checkbox.H
 	}
-	if checkbox.w > f.w {
-		f.w = checkbox.w
+	if checkbox.W > f.W {
+		f.W = checkbox.W
 	}
 
 	f.checkBoxs = append(f.checkBoxs, checkbox)
@@ -154,25 +155,25 @@ func (f *Form) AddSelect(label string, labelWidth, listWidth int) *Select {
 
 	p := f.getLastViewPosition()
 	if p != nil {
-		y = p.h
+		y = p.H
 	} else {
-		y = f.y
+		y = f.Y
 	}
 
 	Select := NewSelect(
 		f.Gui,
 		label,
-		f.x+1,
+		f.X+1,
 		y,
 		labelWidth,
 		listWidth,
 	)
 
-	if Select.field.h > f.h {
-		f.h = Select.field.h
+	if Select.field.H > f.H {
+		f.H = Select.field.H
 	}
-	if Select.field.w > f.w {
-		f.w = Select.field.w
+	if Select.field.W > f.W {
+		f.W = Select.field.W
 	}
 
 	f.selects = append(f.selects, Select)
@@ -186,18 +187,18 @@ func (f *Form) AddRadio(label string) *Radio {
 
 	p := f.getLastViewPosition()
 	if p != nil {
-		y = p.h
+		y = p.H
 	} else {
-		y = f.y
+		y = f.Y
 	}
 
-	radio := NewRadio(f.Gui, label, f.x+1, y)
+	radio := NewRadio(f.Gui, label, f.X+1, y)
 
-	if radio.h > f.h {
-		f.h = radio.h
+	if radio.H > f.H {
+		f.H = radio.H
 	}
-	if radio.w > f.w {
-		f.w = radio.w
+	if radio.W > f.W {
+		f.W = radio.W
 	}
 
 	f.radios = append(f.radios, radio)
@@ -351,7 +352,7 @@ func (f *Form) PreItem(g *gocui.Gui, v *gocui.View) error {
 
 // Draw form
 func (f *Form) Draw() {
-	if v, err := f.Gui.SetView(f.name, f.x, f.y, f.w+1, f.h+1); err != nil {
+	if v, err := f.Gui.SetView(f.name, f.X, f.Y, f.W+1, f.H+1); err != nil {
 		if err != gocui.ErrUnknownView {
 			panic(err)
 		}

@@ -25,8 +25,8 @@ type Attributes struct {
 }
 
 type Position struct {
-	x, y int
-	w, h int
+	X, Y int
+	W, H int
 }
 
 type ComponentType int

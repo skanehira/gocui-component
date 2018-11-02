@@ -17,7 +17,7 @@ func main() {
 		panic(err)
 	}
 
-	component.NewCheckBox(gui, "Age +18:", 0, 0).
+	component.NewCheckBox(gui, "Age +18:", 0, 0, 0).
 		Draw()
 
 	if err := gui.MainLoop(); err != nil && err != gocui.ErrQuit {

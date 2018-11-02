@@ -27,10 +27,10 @@ type textArea struct {
 // NewModal new modal
 func NewModal(gui *gocui.Gui, x, y, w, h int) *Modal {
 	p := &Position{
-		x: x,
-		y: y,
-		w: w,
-		h: h,
+		X: x,
+		Y: y,
+		W: w,
+		H: h,
 	}
 
 	return &Modal{
@@ -50,10 +50,10 @@ func NewModal(gui *gocui.Gui, x, y, w, h int) *Modal {
 				textBgColor: gocui.ColorBlue,
 			},
 			Position: &Position{
-				x: p.x + 1,
-				y: p.y + 1,
-				w: p.w - 1,
-				h: p.h - 3,
+				X: p.X + 1,
+				Y: p.Y + 1,
+				W: p.W - 1,
+				H: p.H - 3,
 			},
 		},
 	}
@@ -69,16 +69,16 @@ func (m *Modal) SetText(text string) *Modal {
 func (m *Modal) AddButton(label string, key Key, handler Handler) *Button {
 	var x, y, w, h int
 	if len(m.buttons) == 0 {
-		w = m.w - 5
+		w = m.W - 5
 		x = w - len(label)
-		h = m.h - 1
+		h = m.H - 1
 		y = h - 2
 	} else {
 		p := m.buttons[len(m.buttons)-1].GetPosition()
-		w = p.w - 10
+		w = p.W - 10
 		x = w - len(label)
-		h = p.h
-		y = p.y
+		h = p.H
+		y = p.Y
 	}
 
 	button := NewButton(m.Gui, label, x, y, len(label)).
@@ -99,7 +99,7 @@ func (m *Modal) GetPosition() *Position {
 // Draw draw modal
 func (m *Modal) Draw() {
 	// modal
-	if v, err := m.Gui.SetView(m.name, m.x, m.y, m.w, m.h); err != nil {
+	if v, err := m.Gui.SetView(m.name, m.X, m.Y, m.W, m.H); err != nil {
 		if err != gocui.ErrUnknownView {
 			panic(err)
 		}
@@ -112,7 +112,7 @@ func (m *Modal) Draw() {
 	// text area
 	area := m.textArea
 	if area.text != "" {
-		if v, err := area.Gui.SetView(area.name, area.x, area.y, area.w, area.h); err != nil {
+		if v, err := area.Gui.SetView(area.name, area.X, area.Y, area.W, area.H); err != nil {
 			if err != gocui.ErrUnknownView {
 				panic(err)
 			}

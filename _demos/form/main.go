@@ -40,10 +40,10 @@ func main() {
 		SetMaskKeybinding(gocui.KeyCtrlA)
 
 	// add checkbox
-	signup.AddCheckBox("Age 18+")
+	signup.AddCheckBox("Age 18+", 11)
 
 	// add select
-	signup.AddSelect("Language", 10, 10).AddOptions("Japanese", "English", "Chinese")
+	signup.AddSelect("Language", 11, 10).AddOptions("Japanese", "English", "Chinese")
 
 	// add radio
 	radios := []string{

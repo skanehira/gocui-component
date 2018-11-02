@@ -361,6 +361,10 @@ func (i *InputField) Close() {
 	if i.field.handlers != nil {
 		i.DeleteKeybindings(i.label.text)
 	}
+
+	if i.field.Validator != nil {
+		i.field.Validator.CloseValidateMsg()
+	}
 }
 
 func (i *InputField) addMargin(view interface{}) (int, int, int, int) {

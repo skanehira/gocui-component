@@ -65,6 +65,12 @@ func (m *Modal) SetText(text string) *Modal {
 	return m
 }
 
+// SetTextColor set text color
+func (m *Modal) SetTextColor(textColor gocui.Attribute) *Modal {
+	m.textArea.textColor = textColor
+	return m
+}
+
 // AddButton add button
 func (m *Modal) AddButton(label string, key Key, handler Handler) *Button {
 	var x, y, w, h int
@@ -120,8 +126,8 @@ func (m *Modal) Draw() {
 			v.Wrap = true
 			v.Frame = false
 
-			v.FgColor = m.textColor
-			v.BgColor = m.textBgColor
+			v.FgColor = area.textColor
+			v.BgColor = area.textBgColor
 
 			fmt.Fprint(v, area.text)
 		}

@@ -8,10 +8,10 @@ import (
 
 type Modal struct {
 	*gocui.Gui
-	name          string
-	textArea      *textArea
-	currentButton int
-	buttons       []*Button
+	name         string
+	textArea     *textArea
+	activeButton int
+	buttons      []*Button
 	*Attributes
 	*Position
 }
@@ -34,9 +34,9 @@ func NewModal(gui *gocui.Gui, x, y, w, h int) *Modal {
 	}
 
 	return &Modal{
-		Gui:           gui,
-		name:          "modal",
-		currentButton: 0,
+		Gui:          gui,
+		name:         "modal",
+		activeButton: 0,
 		Attributes: &Attributes{
 			textColor:   gocui.ColorWhite,
 			textBgColor: gocui.ColorBlue,
@@ -128,12 +128,12 @@ func (m *Modal) Draw() {
 	}
 
 	// button
-	for i, b := range m.buttons {
+	for _, b := range m.buttons {
 		b.Draw()
-		if i == 0 {
-			b.Focus()
-		}
 	}
+
+	m.activeButton = len(m.buttons) - 1
+	m.buttons[m.activeButton].Focus()
 }
 
 // Close close modal
@@ -157,8 +157,8 @@ func (m *Modal) Close() {
 
 // nextButton focus netxt button
 func (m *Modal) nextButton(g *gocui.Gui, v *gocui.View) error {
-	m.buttons[m.currentButton].UnFocus()
-	m.currentButton = (m.currentButton + 1) % len(m.buttons)
-	m.buttons[m.currentButton].Focus()
+	m.buttons[m.activeButton].UnFocus()
+	m.activeButton = (m.activeButton + 1) % len(m.buttons)
+	m.buttons[m.activeButton].Focus()
 	return nil
 }

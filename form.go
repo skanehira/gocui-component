@@ -15,6 +15,7 @@ type Form struct {
 	selects     []*Select
 	radios      []*Radio
 	components  []Component
+	closeFunc   func() error
 	*Position
 }
 
@@ -182,6 +183,7 @@ func (f *Form) AddSelect(label string, labelWidth, listWidth int) *Select {
 	return Select
 }
 
+// AddRadio add radio
 func (f *Form) AddRadio(label string) *Radio {
 	var y int
 
@@ -205,6 +207,11 @@ func (f *Form) AddRadio(label string) *Radio {
 	f.components = append(f.components, radio)
 
 	return radio
+}
+
+// AddCloseFunc add close function
+func (f *Form) AddCloseFunc(function func() error) {
+	f.closeFunc = function
 }
 
 // GetFormData get form data
@@ -379,7 +386,7 @@ func (f *Form) Draw() {
 }
 
 // Close close form
-func (f *Form) Close() {
+func (f *Form) Close(g *gocui.Gui, v *gocui.View) error {
 	if err := f.Gui.DeleteView(f.name); err != nil {
 		if err != gocui.ErrUnknownView {
 			panic(err)
@@ -389,6 +396,14 @@ func (f *Form) Close() {
 	for _, c := range f.components {
 		c.Close()
 	}
+
+	if f.closeFunc != nil {
+		if err := f.closeFunc(); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (f *Form) getLastViewPosition() *Position {

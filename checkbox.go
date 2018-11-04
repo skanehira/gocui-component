@@ -68,7 +68,7 @@ func NewCheckBox(gui *gocui.Gui, label string, x, y, labelWidth int) *CheckBox {
 
 // GetLabel get checkbox label
 func (c *CheckBox) GetLabel() string {
-	return c.box.name
+	return c.label
 }
 
 // GetPosition get checkbox position
@@ -113,7 +113,7 @@ func (c *CheckBox) IsChecked() bool {
 // Focus focus to  checkbox
 func (c *CheckBox) Focus() {
 	c.Gui.Cursor = true
-	c.Gui.SetCurrentView(c.GetLabel())
+	c.Gui.SetCurrentView(c.box.name)
 }
 
 // Focus un focus

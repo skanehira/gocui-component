@@ -43,6 +43,12 @@ func (s *Select) AddOptions(opts ...string) *Select {
 	return s
 }
 
+// AddOption add select option
+func (s *Select) AddOption(opt string) *Select {
+	s.options = append(s.options, opt)
+	return s
+}
+
 // AddAttribute add select attribute
 func (s *Select) AddAttribute(textColor, textBgColor, fgColor, bgColor gocui.Attribute) *Select {
 	s.listColor = &Attributes{
@@ -80,6 +86,17 @@ func (s *Select) UnFocus() {
 // GetType get component type
 func (s *Select) GetType() ComponentType {
 	return s.ctype
+}
+
+// Close close select
+func (s *Select) Close() {
+	s.InputField.Close()
+	if s.isExpanded {
+		for _, opt := range s.options {
+			s.DeleteView(opt)
+			s.DeleteKeybindings(opt)
+		}
+	}
 }
 
 // Draw draw select

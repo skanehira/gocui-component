@@ -39,7 +39,9 @@ func NewSelect(gui *gocui.Gui, label string, x, y, labelWidth, fieldWidth int) *
 
 // AddOptions add select options
 func (s *Select) AddOptions(opts ...string) *Select {
-	s.options = opts
+	for _, opt := range opts {
+		s.options = append(s.options, opt)
+	}
 	return s
 }
 

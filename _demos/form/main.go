@@ -45,17 +45,10 @@ func main() {
 	// add select
 	signup.AddSelect("Language", 11, 10).AddOptions("Japanese", "English", "Chinese")
 
-	// add radio
-	radios := []string{
-		"Go",
-		"Java",
-		"PHP",
-		"Python",
-	}
-
-	for _, r := range radios {
-		signup.AddRadio(r)
-	}
+	// add radios
+	signup.AddRadio("Country", 11).
+		SetMode(component.VsplitMode).
+		AddOptions("Japan", "America", "China")
 
 	// add button
 	signup.AddButton("Regist", signup.regist)
@@ -75,19 +68,19 @@ func (s *signup) regist(g *gocui.Gui, v *gocui.View) error {
 
 	var text string
 
-	for label, ftext := range s.GetFieldText() {
+	for label, ftext := range s.GetFieldTexts() {
 		text += fmt.Sprintf("%s: %s\n", label, ftext)
 	}
 
-	for label, state := range s.GetCheckBoxState() {
+	for label, state := range s.GetCheckBoxStates() {
 		text += fmt.Sprintf("%s: %t\n", label, state)
 	}
 
-	for label, opt := range s.GetSelectedOpt() {
+	for label, opt := range s.GetSelectedOpts() {
 		text += fmt.Sprintf("%s: %s\n", label, opt)
 	}
 
-	text += fmt.Sprintf("radio: %s\n", s.GetRadioText())
+	text += fmt.Sprintf("radio: %s\n", s.GetSelectedRadios())
 
 	modal := component.NewModal(g, 0, 0, 30, 15).SetText(text)
 	modal.AddButton("OK", gocui.KeyEnter, func(g *gocui.Gui, v *gocui.View) error {

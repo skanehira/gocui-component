@@ -23,7 +23,7 @@ type FormData struct {
 	inputs    map[string]string
 	checkBoxs map[string]bool
 	selects   map[string]string
-	radio     string
+	radio     map[string]string
 }
 
 // NewForm new form
@@ -63,13 +63,6 @@ func (f *Form) AddInputField(label string, labelWidth, fieldWidth int) *InputFie
 		fieldWidth,
 	)
 
-	if input.field.H > f.H {
-		f.H = input.field.H
-	}
-	if input.field.W > f.W {
-		f.W = input.field.W
-	}
-
 	f.inputs = append(f.inputs, input)
 	f.components = append(f.components, input)
 
@@ -105,13 +98,6 @@ func (f *Form) AddButton(label string, handler Handler) *Button {
 
 	button.AddHandler(gocui.KeyEnter, handler)
 
-	if button.H > f.H {
-		f.H = button.H
-	}
-	if button.W > f.W {
-		f.W = button.W
-	}
-
 	f.buttons = append(f.buttons, button)
 	f.components = append(f.components, button)
 
@@ -136,13 +122,6 @@ func (f *Form) AddCheckBox(label string, width int) *CheckBox {
 		y,
 		width,
 	)
-
-	if checkbox.H > f.H {
-		f.H = checkbox.H
-	}
-	if checkbox.W > f.W {
-		f.W = checkbox.W
-	}
 
 	f.checkBoxs = append(f.checkBoxs, checkbox)
 	f.components = append(f.components, checkbox)
@@ -170,13 +149,6 @@ func (f *Form) AddSelect(label string, labelWidth, listWidth int) *Select {
 		listWidth,
 	)
 
-	if Select.field.H > f.H {
-		f.H = Select.field.H
-	}
-	if Select.field.W > f.W {
-		f.W = Select.field.W
-	}
-
 	f.selects = append(f.selects, Select)
 	f.components = append(f.components, Select)
 
@@ -184,8 +156,8 @@ func (f *Form) AddSelect(label string, labelWidth, listWidth int) *Select {
 }
 
 // AddRadio add radio
-func (f *Form) AddRadio(label string) *Radio {
-	var y int
+func (f *Form) AddRadio(label string, width int) *Radio {
+	var x, y int
 
 	p := f.getLastViewPosition()
 	if p != nil {
@@ -194,14 +166,7 @@ func (f *Form) AddRadio(label string) *Radio {
 		y = f.Y
 	}
 
-	radio := NewRadio(f.Gui, label, f.X+1, y)
-
-	if radio.H > f.H {
-		f.H = radio.H
-	}
-	if radio.W > f.W {
-		f.W = radio.W
-	}
+	radio := NewRadio(f.Gui, label, x+1, y, width)
 
 	f.radios = append(f.radios, radio)
 	f.components = append(f.components, radio)
@@ -274,6 +239,20 @@ func (f *Form) GetSelectedOpt(target string) string {
 	return f.GetSelectedOpts()[target]
 }
 
+// GetSelectedRadios
+func (f *Form) GetSelectedRadios() map[string]string {
+	radios := map[string]string{}
+	for _, r := range f.radios {
+		radios[r.GetLabel()] = r.GetSelected()
+	}
+
+	return radios
+}
+
+func (f *Form) GetSelectedRadio(target string) string {
+	return f.GetSelectedOpts()[target]
+}
+
 // GetRadio get radio text
 func (f *Form) GetRadioText() string {
 	if len(f.radios) == 0 {
@@ -289,7 +268,7 @@ func (f *Form) GetFormData() *FormData {
 		inputs:    f.GetFieldTexts(),
 		checkBoxs: f.GetCheckBoxStates(),
 		selects:   f.GetSelectedOpts(),
-		radio:     f.GetRadioText(),
+		radio:     f.GetSelectedRadios(),
 	}
 
 	return fd
@@ -383,17 +362,20 @@ func (f *Form) Draw() {
 	}
 
 	for _, cp := range f.components {
+		p := cp.GetPosition()
+		if p.W > f.W {
+			f.W = p.W
+		}
+		if p.H > f.H {
+			f.H = p.H
+		}
 		cp.AddHandlerOnly(gocui.KeyTab, f.NextItem)
 		cp.AddHandlerOnly(gocui.KeyArrowDown, f.NextItem)
 		cp.AddHandlerOnly(gocui.KeyArrowUp, f.PreItem)
-
-		if cp.GetType() == TypeRadio {
-			cp.AddHandlerOnly(gocui.KeyEnter, f.checkRadioButton)
-			cp.AddHandlerOnly(gocui.KeySpace, f.checkRadioButton)
-		}
-
 		cp.Draw()
 	}
+
+	f.SetView(f.name, f.X, f.Y, f.W+1, f.H+1)
 
 	if len(f.components) != 0 {
 		f.components[0].Focus()
@@ -437,16 +419,4 @@ func (f *Form) isButtonLastView() bool {
 	}
 
 	return f.components[cpl-1].GetType() == TypeButton
-}
-
-func (f *Form) checkRadioButton(g *gocui.Gui, v *gocui.View) error {
-	radio := f.components[f.activeItem].(*Radio)
-
-	for _, r := range f.radios {
-		v, _ := f.Gui.View(r.GetLabel())
-		r.UnCheck(g, v)
-	}
-
-	radio.Check(g, v)
-	return nil
 }

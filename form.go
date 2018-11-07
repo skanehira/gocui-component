@@ -215,7 +215,7 @@ func (f *Form) AddCloseFunc(function func() error) {
 }
 
 // GetFormData get form data
-func (f *Form) GetFieldText() map[string]string {
+func (f *Form) GetFieldTexts() map[string]string {
 	data := make(map[string]string)
 
 	if len(f.inputs) == 0 {
@@ -229,8 +229,13 @@ func (f *Form) GetFieldText() map[string]string {
 	return data
 }
 
+// GetFormData get form data with field name
+func (f *Form) GetFieldText(target string) string {
+	return f.GetFieldTexts()[target]
+}
+
 // GetCheckBoxState get checkbox states
-func (f *Form) GetCheckBoxState() map[string]bool {
+func (f *Form) GetCheckBoxStates() map[string]bool {
 	state := make(map[string]bool)
 
 	if len(f.checkBoxs) == 0 {
@@ -244,8 +249,13 @@ func (f *Form) GetCheckBoxState() map[string]bool {
 	return state
 }
 
+// GetCheckBoxState get checkbox states
+func (f *Form) GetCheckBoxState(target string) bool {
+	return f.GetCheckBoxStates()[target]
+}
+
 // GetSelectedOpt get selected options
-func (f *Form) GetSelectedOpt() map[string]string {
+func (f *Form) GetSelectedOpts() map[string]string {
 	opts := make(map[string]string)
 
 	if len(f.selects) == 0 {
@@ -257,6 +267,11 @@ func (f *Form) GetSelectedOpt() map[string]string {
 	}
 
 	return opts
+}
+
+// GetSelectedOpt get selected options
+func (f *Form) GetSelectedOpt(target string) string {
+	return f.GetSelectedOpts()[target]
 }
 
 // GetRadio get radio text
@@ -271,9 +286,9 @@ func (f *Form) GetRadioText() string {
 // GetFormData get form data
 func (f *Form) GetFormData() *FormData {
 	fd := &FormData{
-		inputs:    f.GetFieldText(),
-		checkBoxs: f.GetCheckBoxState(),
-		selects:   f.GetSelectedOpt(),
+		inputs:    f.GetFieldTexts(),
+		checkBoxs: f.GetCheckBoxStates(),
+		selects:   f.GetSelectedOpts(),
 		radio:     f.GetRadioText(),
 	}
 

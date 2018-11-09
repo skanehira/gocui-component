@@ -2,6 +2,8 @@ package component
 
 import (
 	"fmt"
+	"math"
+	"strings"
 
 	"github.com/jroimartin/gocui"
 )
@@ -25,12 +27,12 @@ type textArea struct {
 }
 
 // NewModal new modal
-func NewModal(gui *gocui.Gui, x, y, w, h int) *Modal {
+func NewModal(gui *gocui.Gui, x, y, w int) *Modal {
 	p := &Position{
 		X: x,
 		Y: y,
 		W: w,
-		H: h,
+		H: y + 3,
 	}
 
 	return &Modal{
@@ -53,7 +55,7 @@ func NewModal(gui *gocui.Gui, x, y, w, h int) *Modal {
 				X: p.X + 1,
 				Y: p.Y + 1,
 				W: p.W - 1,
-				H: p.H - 3,
+				H: p.H - 1,
 			},
 		},
 	}
@@ -62,6 +64,16 @@ func NewModal(gui *gocui.Gui, x, y, w, h int) *Modal {
 // SetText set text
 func (m *Modal) SetText(text string) *Modal {
 	m.textArea.text = text
+	h := int(roundUp(float64(len(text)/(m.W-m.X)), 0))
+
+	newLineCount := strings.Count(text, "\n")
+	if newLineCount > h {
+		h = newLineCount
+	}
+
+	m.textArea.H += h
+	m.H += h
+
 	return m
 }
 
@@ -73,17 +85,16 @@ func (m *Modal) SetTextColor(textColor gocui.Attribute) *Modal {
 
 // AddButton add button
 func (m *Modal) AddButton(label string, key Key, handler Handler) *Button {
-	var x, y, w, h int
+	var x, y, w int
 	if len(m.buttons) == 0 {
 		w = m.W - 5
 		x = w - len(label)
-		h = m.H - 1
-		y = h - 2
+		y = m.H - 1
+		m.H += 2
 	} else {
 		p := m.buttons[len(m.buttons)-1].GetPosition()
 		w = p.W - 10
 		x = w - len(label)
-		h = p.H
 		y = p.Y
 	}
 
@@ -138,8 +149,10 @@ func (m *Modal) Draw() {
 		b.Draw()
 	}
 
-	m.activeButton = len(m.buttons) - 1
-	m.buttons[m.activeButton].Focus()
+	if len(m.buttons) != 0 {
+		m.activeButton = len(m.buttons) - 1
+		m.buttons[m.activeButton].Focus()
+	}
 }
 
 // Close close modal
@@ -167,4 +180,14 @@ func (m *Modal) nextButton(g *gocui.Gui, v *gocui.View) error {
 	m.activeButton = (m.activeButton + 1) % len(m.buttons)
 	m.buttons[m.activeButton].Focus()
 	return nil
+}
+
+func roundUp(num, places float64) float64 {
+	shift := math.Pow(10, places)
+	return roundUpInt(num*shift) / shift
+}
+
+func roundUpInt(num float64) float64 {
+	t := math.Trunc(num)
+	return t + math.Copysign(1, num)
 }

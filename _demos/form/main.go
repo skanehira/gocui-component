@@ -82,7 +82,7 @@ func (s *signup) regist(g *gocui.Gui, v *gocui.View) error {
 
 	text += fmt.Sprintf("radio: %s\n", s.GetSelectedRadios())
 
-	modal := component.NewModal(g, 0, 0, 30, 15).SetText(text)
+	modal := component.NewModal(g, 0, 0, 30).SetText(text)
 	modal.AddButton("OK", gocui.KeyEnter, func(g *gocui.Gui, v *gocui.View) error {
 		modal.Close()
 		s.SetCurrentItem(s.GetCurrentItem())

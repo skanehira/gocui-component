@@ -17,7 +17,12 @@ func main() {
 		panic(err)
 	}
 
-	modal := component.NewModal(gui, 0, 0, 30, 6).SetText("Do you want MacBook Pro?")
+	maxX, maxY := gui.Size()
+	x, y, w := maxX/3, maxY/3, maxX/3*2
+
+	modal := component.NewModal(gui, x, y, w).
+		SetText("Do you want MacBook Pro?")
+
 	modal.AddButton("No", gocui.KeyEnter, quit)
 	modal.AddButton("Yes", gocui.KeyEnter, quit)
 

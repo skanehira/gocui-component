@@ -15,7 +15,7 @@ type Form struct {
 	selects     []*Select
 	radios      []*Radio
 	components  []Component
-	closeFunc   func() error
+	closeFuncs  []func() error
 	*Position
 }
 
@@ -176,7 +176,7 @@ func (f *Form) AddRadio(label string, width int) *Radio {
 
 // AddCloseFunc add close function
 func (f *Form) AddCloseFunc(function func() error) {
-	f.closeFunc = function
+	f.closeFuncs = append(f.closeFuncs, function)
 }
 
 // GetFormData get form data
@@ -394,9 +394,9 @@ func (f *Form) Close(g *gocui.Gui, v *gocui.View) error {
 		c.Close()
 	}
 
-	if f.closeFunc != nil {
-		if err := f.closeFunc(); err != nil {
-			return err
+	if len(f.closeFuncs) != 0 {
+		for _, f := range f.closeFuncs {
+			f()
 		}
 	}
 

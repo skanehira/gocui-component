@@ -6,6 +6,7 @@ import (
 	"github.com/jroimartin/gocui"
 )
 
+// CheckBox struct
 type CheckBox struct {
 	*gocui.Gui
 	label     string
@@ -110,13 +111,13 @@ func (c *CheckBox) IsChecked() bool {
 	return c.isChecked
 }
 
-// Focus focus to  checkbox
+// Focus focus to checkbox
 func (c *CheckBox) Focus() {
 	c.Gui.Cursor = true
 	c.Gui.SetCurrentView(c.box.name)
 }
 
-// Focus un focus
+// UnFocus unfocus
 func (c *CheckBox) UnFocus() {
 	c.Gui.Cursor = false
 }
@@ -179,6 +180,7 @@ func (c *CheckBox) Close() {
 	c.DeleteKeybindings(c.box.name)
 }
 
+// AddHandlerOnly add handler not retrun
 func (c *CheckBox) AddHandlerOnly(key Key, handler Handler) {
 	c.AddHandler(key, handler)
 }

@@ -4,6 +4,7 @@ import (
 	"github.com/jroimartin/gocui"
 )
 
+// Form form struct
 type Form struct {
 	*gocui.Gui
 	activeItem  int
@@ -19,6 +20,7 @@ type Form struct {
 	*Position
 }
 
+// FormData form data struct
 type FormData struct {
 	inputs    map[string]string
 	checkBoxs map[string]bool
@@ -179,7 +181,7 @@ func (f *Form) AddCloseFunc(function func() error) {
 	f.closeFuncs = append(f.closeFuncs, function)
 }
 
-// GetFormData get form data
+// GetFieldTexts form data
 func (f *Form) GetFieldTexts() map[string]string {
 	data := make(map[string]string)
 
@@ -194,12 +196,12 @@ func (f *Form) GetFieldTexts() map[string]string {
 	return data
 }
 
-// GetFormData get form data with field name
+// GetFieldText get form data with field name
 func (f *Form) GetFieldText(target string) string {
 	return f.GetFieldTexts()[target]
 }
 
-// GetCheckBoxState get checkbox states
+// GetCheckBoxStates get checkbox states
 func (f *Form) GetCheckBoxStates() map[string]bool {
 	state := make(map[string]bool)
 
@@ -219,7 +221,7 @@ func (f *Form) GetCheckBoxState(target string) bool {
 	return f.GetCheckBoxStates()[target]
 }
 
-// GetSelectedOpt get selected options
+// GetSelectedOpts get selected options
 func (f *Form) GetSelectedOpts() map[string]string {
 	opts := make(map[string]string)
 
@@ -239,7 +241,7 @@ func (f *Form) GetSelectedOpt(target string) string {
 	return f.GetSelectedOpts()[target]
 }
 
-// GetSelectedRadios
+// GetSelectedRadios get selected radio
 func (f *Form) GetSelectedRadios() map[string]string {
 	radios := map[string]string{}
 	for _, r := range f.radios {
@@ -249,11 +251,12 @@ func (f *Form) GetSelectedRadios() map[string]string {
 	return radios
 }
 
+// GetSelectedRadio get selected radio
 func (f *Form) GetSelectedRadio(target string) string {
 	return f.GetSelectedOpts()[target]
 }
 
-// GetRadio get radio text
+// GetRadioText get radio text
 func (f *Form) GetRadioText() string {
 	if len(f.radios) == 0 {
 		return ""
@@ -304,7 +307,7 @@ func (f *Form) GetItems() []Component {
 	return f.components
 }
 
-// SetCurretnItem set current item index
+// SetCurrentItem set current item index
 func (f *Form) SetCurrentItem(index int) *Form {
 	f.activeItem = index
 	f.components[index].Focus()

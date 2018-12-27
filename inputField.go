@@ -7,17 +7,20 @@ import (
 	"github.com/jroimartin/gocui"
 )
 
+// Margin struct
 type Margin struct {
 	top  int
 	left int
 }
 
+// InputField struct
 type InputField struct {
 	*gocui.Gui
 	label *Label
 	field *Field
 }
 
+// Label struct
 type Label struct {
 	text      string
 	width     int
@@ -27,6 +30,7 @@ type Label struct {
 	margin *Margin
 }
 
+// Field struct
 type Field struct {
 	text      string
 	width     int
@@ -118,7 +122,7 @@ func NewInputField(gui *gocui.Gui, labelText string, x, y, labelWidth, fieldWidt
 	return i
 }
 
-// AddFieldTextAttribute add field colors
+// AddFieldAttribute add field colors
 func (i *InputField) AddFieldAttribute(textColor, textBgColor, fgColor, bgColor gocui.Attribute) *InputField {
 	i.field.Attributes = &Attributes{
 		textColor:      textColor,
@@ -182,13 +186,13 @@ func (i *InputField) SetFieldBorder() *InputField {
 	return i
 }
 
-// Mask set input field to mask '*'
+// SetMask set input field to mask '*'
 func (i *InputField) SetMask() *InputField {
 	i.field.mask = true
 	return i
 }
 
-// SetMask set or unset input field to mask '*' with key
+// SetMaskKeybinding set or unset input field to mask '*' with key
 func (i *InputField) SetMaskKeybinding(key Key) *InputField {
 	if err := i.Gui.SetKeybinding(i.label.text, key, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
 		v.Mask ^= '*'
@@ -386,6 +390,7 @@ func (i *InputField) cutNewline(text string) string {
 	return strings.Replace(text, "\n", "", -1)
 }
 
+// AddHandlerOnly add handler not return
 func (i *InputField) AddHandlerOnly(key Key, handler Handler) {
 	i.AddHandler(key, handler)
 }

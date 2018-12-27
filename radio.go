@@ -11,13 +11,17 @@ const (
 	checkedRadioButton = "\u25c9"
 )
 
+// Mode radio mode
 type Mode int
 
 const (
-	VsplitMode Mode = iota
+	// VerticalMode display radio button vertical
+	VerticalMode Mode = iota
+	// SplitMode display radio button split
 	SplitMode
 )
 
+// Radio struct
 type Radio struct {
 	*gocui.Gui
 	label    string
@@ -53,7 +57,7 @@ func NewRadio(gui *gocui.Gui, label string, x, y, w int) *Radio {
 		label:    label,
 		handlers: make(Handlers),
 		ctype:    TypeRadio,
-		mode:     VsplitMode,
+		mode:     VerticalMode,
 		Position: p,
 		Attributes: &Attributes{
 			textColor:   gocui.ColorYellow | gocui.AttrBold,
@@ -93,7 +97,7 @@ func newOption(name string, x, y int) *option {
 	}
 }
 
-// SetMode set mode SplitMode or VsplitMode
+// SetMode set mode SplitMode or VerticalMode
 func (r *Radio) SetMode(mode Mode) *Radio {
 	r.mode = mode
 	return r
@@ -138,7 +142,7 @@ func (r *Radio) addOptionWithMode(name string, mode Mode) *Radio {
 		if opt.W > r.W {
 			r.W = opt.W
 		}
-	case VsplitMode:
+	case VerticalMode:
 		opt = newOption(name, p.X, p.H-1)
 		r.options = append(r.options, opt)
 		if opt.H > r.H {

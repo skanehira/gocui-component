@@ -6,6 +6,7 @@ import (
 	"github.com/jroimartin/gocui"
 )
 
+// Select struct
 type Select struct {
 	*InputField
 	options      []string
@@ -222,7 +223,6 @@ func (s *Select) closeOpt(g *gocui.Gui, v *gocui.View) error {
 func (s *Select) hasOpts() bool {
 	if len(s.options) > 0 {
 		return true
-	} else {
-		return false
 	}
+	return false
 }

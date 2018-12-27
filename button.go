@@ -6,6 +6,7 @@ import (
 	"github.com/jroimartin/gocui"
 )
 
+// Button button struct
 type Button struct {
 	*gocui.Gui
 	label    string

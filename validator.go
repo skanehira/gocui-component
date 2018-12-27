@@ -6,8 +6,10 @@ import (
 	"github.com/jroimartin/gocui"
 )
 
+// Validate validate function
 type Validate func(text string) bool
 
+// Validator validate struct
 type Validator struct {
 	*gocui.Gui
 	name     string

@@ -8,6 +8,7 @@ import (
 	"github.com/jroimartin/gocui"
 )
 
+// Modal struct
 type Modal struct {
 	*gocui.Gui
 	name         string

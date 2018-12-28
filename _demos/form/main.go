@@ -47,7 +47,7 @@ func main() {
 
 	// add radios
 	signup.AddRadio("Country", 11).
-		SetMode(component.VsplitMode).
+		SetMode(component.VerticalMode).
 		AddOptions("Japan", "America", "China")
 
 	// add button

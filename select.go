@@ -104,6 +104,9 @@ func (s *Select) Close() {
 
 // Draw draw select
 func (s *Select) Draw() {
+	if len(s.options) > 0 {
+		s.InputField.SetText(s.options[0])
+	}
 	s.InputField.Draw()
 }
 

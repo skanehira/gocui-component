@@ -97,19 +97,9 @@ func NewInputField(gui *gocui.Gui, labelText string, x, y, labelWidth, fieldWidt
 			top:  0,
 			left: 0,
 		},
-		Validator: &Validator{
-			Gui:      gui,
-			name:     label.text + "errMsg",
-			validate: func(text string) bool { return true },
-			Position: &Position{
-				X: fp.X,
-				Y: fp.Y + 1,
-				W: fp.W,
-				H: fp.H + 1,
-			},
-		},
-		editable: true,
-		ctype:    TypeInputField,
+		Validator: NewValidator(gui, label.text+"validator", fp.X, fp.Y+1, fp.W, fp.H+1),
+		editable:  true,
+		ctype:     TypeInputField,
 	}
 
 	// new input field
@@ -163,14 +153,9 @@ func (i *InputField) AddMarginLeft(left int) *InputField {
 	return i
 }
 
-// AddValidator add input validator
-func (i *InputField) AddValidator(errMsg string, validate Validate) *InputField {
-	v := i.field.Validator
-	v.errMsg = errMsg
-	v.validate = validate
-	if v.X+len(errMsg) > v.W {
-		v.W += len(errMsg)
-	}
+// AddValidate add input validator
+func (i *InputField) AddValidate(errMsg string, validate func(value string) bool) *InputField {
+	i.field.AddValidate(errMsg, validate)
 	return i
 }
 
@@ -252,7 +237,7 @@ func (i *InputField) Edit(v *gocui.View, key gocui.Key, ch rune, mod gocui.Modif
 	i.field.text = i.cutNewline(v.Buffer())
 
 	// validate
-	i.Validate()
+	i.field.Validate(i.GetFieldText())
 }
 
 // GetFieldText get input field text
@@ -270,17 +255,10 @@ func (i *InputField) GetPosition() *Position {
 	return i.field.Position
 }
 
-// Validate validate input field
+// Validate validate field
 func (i *InputField) Validate() bool {
-	i.field.isValid = i.field.validate(i.field.text)
-
-	if !i.field.isValid {
-		i.field.DispValidateMsg()
-	} else {
-		i.field.CloseValidateMsg()
-	}
-
-	return i.field.isValid
+	i.field.Validate(i.GetFieldText())
+	return i.field.IsValid()
 }
 
 // IsValid valid field data will be return true

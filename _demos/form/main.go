@@ -30,12 +30,12 @@ func main() {
 
 	// add input field
 	signup.AddInputField("First Name", 11, 18).
-		AddValidator("required input", requireValidator)
+		AddValidate("required input", requireValidator)
 	signup.AddInputField("Last Name", 11, 18).
-		AddValidator("required input", requireValidator)
+		AddValidate("required input", requireValidator)
 
 	signup.AddInputField("Password", 11, 18).
-		AddValidator("required input", requireValidator).
+		AddValidate("required input", requireValidator).
 		SetMask().
 		SetMaskKeybinding(gocui.KeyCtrlA)
 
@@ -98,8 +98,8 @@ func quit(g *gocui.Gui, v *gocui.View) error {
 	return gocui.ErrQuit
 }
 
-func requireValidator(text string) bool {
-	if text == "" {
+func requireValidator(value string) bool {
+	if value == "" {
 		return false
 	}
 	return true

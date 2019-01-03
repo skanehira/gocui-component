@@ -7,8 +7,6 @@ import (
 	component "github.com/skanehira/gocui-component"
 )
 
-var rep = regexp.MustCompile(`^[\w]+$`)
-
 func main() {
 	gui, err := gocui.NewGui(gocui.Output256)
 	if err != nil {
@@ -22,7 +20,8 @@ func main() {
 
 	component.NewInputField(gui, "password", 0, 0, 10, 15).
 		AddHandler(gocui.KeyEnter, quit).
-		AddValidator("invalid password", validator).
+		AddValidate("password must start with number", startNumber).
+		AddValidate("password myst end with character", endString).
 		SetMask().
 		SetMaskKeybinding(gocui.KeyCtrlA).
 		Draw()
@@ -36,6 +35,10 @@ func quit(g *gocui.Gui, v *gocui.View) error {
 	return gocui.ErrQuit
 }
 
-func validator(text string) bool {
-	return rep.MatchString(text)
+func startNumber(value string) bool {
+	return regexp.MustCompile(`^[0-9]`).MatchString(value)
+}
+
+func endString(value string) bool {
+	return regexp.MustCompile(`[a-zA-Z]$`).MatchString(value)
 }
